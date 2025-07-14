@@ -11,6 +11,11 @@ go = "1.21"
 rust = "stable"
 neovim = "nightly"
 
+[tasks]
+test = "echo 'Running tests...'"
+build = "echo 'Building...'"
+deploy = "echo 'Deploying...'"
+
 [env]
 EDITOR = "nvim"
 PAGER = "less -R"
