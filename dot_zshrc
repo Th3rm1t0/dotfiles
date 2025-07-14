@@ -1,0 +1,61 @@
+# 基本設定
+export LANG=ja_JP.UTF-8
+export LC_ALL=ja_JP.UTF-8
+
+# ヒストリ設定
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt share_history
+setopt hist_verify
+setopt hist_expand
+
+# 補完設定
+autoload -Uz compinit
+compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' menu select
+
+# ディレクトリ移動設定
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+
+# mise の設定
+eval "$(mise activate zsh)"
+
+# Starship の設定
+eval "$(starship init zsh)"
+
+# 基本的なエイリアス
+alias ll='ls -la'
+alias la='ls -A'
+alias l='ls -CF'
+alias grep='grep --color=auto'
+alias vim='nvim'
+alias vi='nvim'
+
+# 関数
+function mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+function ssh-add-1password() {
+    op document get "SSH Private Key" | ssh-add -
+}
+
+# PATH設定
+export PATH="/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# 1Password CLI の設定
+if command -v op &> /dev/null; then
+    eval "$(op completion zsh)"
+fi
+
+# Git の設定
+export GIT_EDITOR=nvim
+
