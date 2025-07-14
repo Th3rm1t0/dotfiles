@@ -71,6 +71,11 @@ install_tools() {
     esac
 }
 
+# mise でツールをインストール
+mise_install() {
+    mise install
+}
+
 # zsh を デフォルトシェルに設定
 setup_zsh() {
     if [[ "$SHELL" != *"zsh"* ]]; then
@@ -86,6 +91,7 @@ main() {
     
     install_tools
     setup_zsh
+    mise_install
     
     log_info "Installation completed!"
     log_info "Please restart your terminal and run 'chezmoi apply' to apply configurations"
