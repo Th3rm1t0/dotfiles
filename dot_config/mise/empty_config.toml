@@ -1,0 +1,17 @@
+[settings]
+experimental = true
+legacy_version_file = true
+always_keep_download = false
+plugin_autoupdate_last_check_duration = "7 days"
+
+[tools]
+node = "lts"
+python = "3.11"
+go = "1.21"
+rust = "stable"
+neovim = "nightly"
+
+[env]
+EDITOR = "nvim"
+PAGER = "less -R"
+

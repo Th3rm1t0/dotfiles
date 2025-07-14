@@ -1,0 +1,14 @@
+[data]
+    name = "Your Name"
+    email = "your.email@example.com"
+    
+[diff]
+    pager = "less -R"
+    
+[edit]
+    command = "nvim"
+    
+[git]
+    autoCommit = true
+    autoPush = true
+
