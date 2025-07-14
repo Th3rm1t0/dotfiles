@@ -58,10 +58,6 @@ install_tools() {
             
             # mise
             curl https://mise.jdx.dev/install.sh | sh
-            SHELL_NAME=$(basename $SHELL)
-            RC_FILE="$HOME/.${SHELL_NAME}rc"
-            echo 'eval "$(mise activate)"' >> "$RC_FILE"
-            source "$RC_FILE"
 
             # 1Password CLI
             curl -sS https://downloads.1password.com/linux/keys/1password.asc | sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
@@ -77,7 +73,7 @@ install_tools() {
 
 # mise でツールをインストール
 mise_install() {
-    mise install
+   ~/.local/bin/mise install
 }
 
 # zsh を デフォルトシェルに設定
