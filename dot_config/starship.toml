@@ -15,6 +15,7 @@ $line_break\
 $character"""
 
 [character]
+error_symbol = '[✗](bold red) '
 
 [directory]
 truncation_length = 3
