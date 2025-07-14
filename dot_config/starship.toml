@@ -21,7 +21,6 @@ truncation_length = 3
 truncation_symbol = "…/"
 
 [git_branch]
-symbol = "🌱 "
 
 [git_status]
 ahead = "⇡${count}"
@@ -51,3 +50,4 @@ symbol = "☁️ "
 
 [gcloud]
 symbol = "☁️ "
+
