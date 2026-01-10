@@ -1,0 +1,49 @@
+{ config, pkgs, ... }:
+
+{
+    imports = [
+        ../home
+    ];
+
+    home.stateVersion = "24.05";
+
+    targets.genericLinux.enable = true;
+
+    # XDG Base Directory
+    xdg = {
+        enable = true;
+        userDirs = {
+            enable = true;
+            createDirectories = true;
+        };
+    };
+
+    # Common packages
+    home.packages = with pkgs; [
+        coreutils
+        curl
+        wget
+        git
+
+        ripgrep
+        fd
+        eza
+        bat
+        fzf
+        jq
+        yq
+        tree
+    ];
+
+    # Git
+    programs.git = {
+        enable = true;
+        settings = {
+            user = {
+                name = "Th3rm1t0";
+                email = "80260010+Th3rm1t0@users.noreply.github.com";
+            };
+            init.defaultBranch = "main";
+        };
+    };
+}
