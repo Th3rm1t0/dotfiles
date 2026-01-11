@@ -1,7 +1,10 @@
 { config, pkgs, ... }:
 
 {
-    imports = [];
+    imports = [
+        ./programs/fzf
+        ./programs/zsh
+    ];
 
     programs.home-manager.enable = true;
 
@@ -10,7 +13,7 @@
         package = pkgs.nix;
         settings = {
             experimental-features = [ "nix-command" "flakes" ];
-      warn-dirty = false;
+      warn-dirty = true;
         };
     };
 }

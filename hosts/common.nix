@@ -29,7 +29,6 @@
         fd
         eza
         bat
-        fzf
         jq
         yq
         tree
