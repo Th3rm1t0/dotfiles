@@ -3,6 +3,7 @@
 {
     imports = [
         ./programs/fzf
+        ./programs/starship
         ./programs/zsh
     ];
 
