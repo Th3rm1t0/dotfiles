@@ -2,6 +2,7 @@
 
 {
     imports = [
+        ./programs/claude-code
         ./programs/fzf
         ./programs/starship
         ./programs/zsh

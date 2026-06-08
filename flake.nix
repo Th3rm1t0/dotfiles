@@ -7,6 +7,7 @@
             url = "github:nix-community/home-manager";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        claude-code.url = "github:sadjow/claude-code-nix"; # claude-code の最新版への追従のため
     };
 
     outputs = { self, nixpkgs, home-manager, ... }@inputs:
