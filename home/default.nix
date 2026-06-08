@@ -3,6 +3,7 @@
 {
     imports = [
         ./programs/claude-code
+        ./programs/hermes-agent
         ./programs/fzf
         ./programs/starship
         ./programs/zsh

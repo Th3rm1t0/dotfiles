@@ -8,6 +8,7 @@
             inputs.nixpkgs.follows = "nixpkgs";
         };
         claude-code.url = "github:sadjow/claude-code-nix"; # claude-code の最新版への追従のため
+        hermes-agent.url = "github:NousResearch/hermes-agent"; # Hermes Agent (Nous Research) の導入のため
     };
 
     outputs = { self, nixpkgs, home-manager, ... }@inputs:
