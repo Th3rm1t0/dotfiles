@@ -12,6 +12,7 @@
         ./programs/lazygit
         ./programs/btop
         ./programs/dust
+        ./programs/hyperfine
     ];
 
     programs.home-manager.enable = true;
