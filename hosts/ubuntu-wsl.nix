@@ -13,12 +13,10 @@
     programs.wezterm.enable = false;
 
     home.sessionVariables = {
+        # wslview は Ubuntu WSL に標準で入っている wslu (apt) から利用できる。
+        # nixpkgs の wslu はプロジェクト終了により削除されたため、ここでは導入しない。
         BROWSER = "wslview";
     };
-
-    home.packages = with pkgs; [
-        wslu # WSL utilities
-    ];
 
     programs.git.settings = {
         # Avoid CRLF conversion issues in WSL
