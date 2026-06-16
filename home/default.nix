@@ -11,6 +11,7 @@
         ./programs/zoxide
         ./programs/lazygit
         ./programs/btop
+        ./programs/dust
     ];
 
     programs.home-manager.enable = true;
