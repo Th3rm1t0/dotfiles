@@ -10,6 +10,7 @@
         ./programs/delta
         ./programs/zoxide
         ./programs/lazygit
+        ./programs/btop
     ];
 
     programs.home-manager.enable = true;
