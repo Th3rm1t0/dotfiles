@@ -7,6 +7,7 @@
         ./programs/fzf
         ./programs/starship
         ./programs/zsh
+        ./programs/delta
     ];
 
     programs.home-manager.enable = true;
