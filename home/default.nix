@@ -8,6 +8,7 @@
         ./programs/starship
         ./programs/zsh
         ./programs/delta
+        ./programs/zoxide
     ];
 
     programs.home-manager.enable = true;
