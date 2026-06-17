@@ -14,6 +14,7 @@
         ./programs/btop
         ./programs/dust
         ./programs/hyperfine
+        ./programs/1password
     ];
 
     programs.home-manager.enable = true;
