@@ -9,6 +9,12 @@
         };
         claude-code.url = "github:sadjow/claude-code-nix"; # claude-code の最新版への追従のため
         hermes-agent.url = "github:NousResearch/hermes-agent"; # Hermes Agent (Nous Research) の導入のため
+        # Claude skill 管理基盤 (home/claude) が使用
+        agent-skills = {
+            url = "github:Kyure-A/agent-skills-nix";
+            inputs.nixpkgs.follows = "nixpkgs";
+            inputs.home-manager.follows = "home-manager";
+        };
     };
 
     outputs = { self, nixpkgs, home-manager, ... }@inputs:

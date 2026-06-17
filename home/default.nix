@@ -2,6 +2,7 @@
 
 {
     imports = [
+        ./claude
         ./programs/claude-code
         ./programs/hermes-agent
         ./programs/fzf

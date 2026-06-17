@@ -19,6 +19,7 @@
 ├── flake.lock          # 依存関係のロックファイル（自動生成）
 ├── home/               # ユーザー環境設定の本体
 │   ├── default.nix     # home/ のエントリポイント
+│   ├── claude/         # Claude skill 管理（agent-skills-nix。programs と分離）
 │   ├── programs/       # アプリケーション設定（programs.* に対応）
 │   └── services/       # サービス設定（services.* に対応）
 ├── hosts/              # ホスト固有の設定
