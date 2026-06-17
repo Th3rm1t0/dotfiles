@@ -49,6 +49,23 @@ export OP_SERVICE_ACCOUNT_TOKEN="ops_..."
 op read "op://Private/GitHub/token"
 ```
 
+## テンプレートから設定ファイルを生成する（op inject / 推奨）
+
+秘密入りの設定ファイルは、`{{ op://... }}` 参照だけのテンプレートをコミットし、
+実行時に `op inject` で解決する。実値は Nix store に焼かず `$HOME` 下にのみ出す。
+
+- テンプレート: `home/programs/1password/templates/example.yml.tpl`（参照のみ・コミット可）
+- 駆動: `flake.nix` の `apps.<system>.render-secrets`
+
+```bash
+eval "$(op signin)"        # 解錠
+nix run .#render-secrets   # 解決して ~/.config/example/config.yml を生成
+```
+
+新しい秘密はテンプレートに `{{ op://Vault/Item/field }}` を追記する。出力先や
+対象を変えるときは `flake.nix` の `apps.render-secrets` を調整する。`op inject -o`
+は既定で 0600 出力。生成物（実値入り）をリポジトリ内に出すなら `.gitignore` へ。
+
 ## スコープ外（今回は入れていない）
 
 - **SSH エージェント / git コミット署名**: 鍵を保管庫に封印したまま使う純正

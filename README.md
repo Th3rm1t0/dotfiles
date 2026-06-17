@@ -33,6 +33,8 @@ Nix flakes のエントリーポイントとして機能
 外部への依存 (nixpkgs や home-manager など) の宣言、および各ホストに対する設定のエクスポートを実施
 新規ホスト追加時には `homeConfigurations` に設定を追加する
 
+また `apps.<system>.render-secrets` を公開する。`nix run .#render-secrets` で、1Password の秘密参照テンプレート (`{{ op://... }}`) を実値の設定ファイルへ実行時解決する (詳細は `home/programs/1password/README.md`)
+
 ## hosts/
 
 ホストマシンとユーザーの組み合わせ、およびそれらの組み合わせに紐付く設定を定義する
