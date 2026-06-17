@@ -1,75 +1,60 @@
 # home/programs/1password — 1Password CLI (op)
 
-1Password CLI (`op`) をパッケージとして導入する。秘密情報は dotfiles や
-平文ファイルに置かず、実行時に `op` 経由で取得する運用を前提とする。
+`op` CLI を導入し、秘密は **1Password を真実の源**として実行時に取得する。
+平文の秘密は dotfiles にもコミットにも置かない。WSL でも Windows アプリに
+依存せず、Ubuntu 側だけで完結する。
 
-WSL だが Windows デスクトップアプリには依存せず、Ubuntu 側だけで認証〜
-秘密取得まで完結させる。
-
-## 初期セットアップ（手動サインイン）
-
-アカウント登録はブートストラップなので手動で一度だけ行う。リポジトリには
-認証情報を一切置かない。
+## サインイン（初回のみ・手動）
 
 ```bash
 op account add --address my.1password.com --email <あなたのメール>
-eval "$(op signin)"   # セッション解錠（既定で約 30 分キャッシュ）
-op whoami             # 動作確認
+eval "$(op signin)"
+op whoami
 ```
+設定は `~/.config/op/` に保存され、以後はパスワードだけで解錠できる
+（デスクトップアプリ非導入のため生体認証は使えない）。
 
-設定は `~/.config/op/` に保存され、以後はパスワードだけで解錠できる。
-デスクトップアプリ非導入のため生体認証は使えない。
+## 秘密ファイルを宣言的に生成する（render-secrets）
 
-## 基本的な使い方
+`{{ op://... }}` 参照だけのテンプレートを置き、`nix run` で実値ファイルへ解決する。
+実値は Nix store に焼かず `$HOME` 下に 0600 で出力する。
+
+| ファイル | 役割 |
+|---|---|
+| `secrets.nix` | **管理対象の一覧**（増やすのはここ） |
+| `templates/*.tpl` | `{{ op://Vault/Item/field }}` 入りの雛形 |
+| `render-secrets.nix` | 生成ロジック（基本は触らない） |
+
+### 実行
 
 ```bash
-# 単一フィールドの取得
-op read "op://Private/GitHub/token"
-
-# アイテムの取得
-op item get "GitHub" --fields label=token
-
-# 秘密を環境変数に注入してコマンド実行（.env を平文で置かない）
-op run --env-file=.env -- <command>
-
-# テンプレートに秘密を埋め込む
-op inject -i config.tpl -o config
+eval "$(op signin)"
+nix run .#render-secrets   # 一覧の全テンプレを実値ファイルへ生成
 ```
 
-`op run` / `op inject` では値を `op://Vault/Item/field` 参照で書く。
+### 秘密ファイルを増やす
 
-## サービスアカウント（任意・自動化向け）
+1. `templates/foo.tpl` を作る（中に `{{ op://Vault/Item/field }}`）
+2. `secrets.nix` に1行足す:
+   ```nix
+   { template = ./templates/foo.tpl; out = ".aws/credentials"; }
+   ```
+   `out` は `$HOME` からの相対パス。親ディレクトリは自動作成される。
+3. `git add` して `nix run .#render-secrets`
 
-対話解錠を避けたい場合はサービスアカウントトークンを使う。トークンは
-gitignore したファイルや実行時 env に置き、**Nix store には絶対に書かない**
-（store は誰でも読める平文のため）。
+参照先（vault/item/field）が 1Password に実在する必要がある。**コミットするのは
+テンプレートと一覧だけ**で、生成物（実値入り）はコミットしない。
+
+## その他の取得方法
 
 ```bash
-export OP_SERVICE_ACCOUNT_TOKEN="ops_..."
-op read "op://Private/GitHub/token"
+op read "op://Private/GitHub/token"     # 単発で1個だけ
+op run --env-file=.env -- <command>      # env で渡す（ファイルを作らない）
 ```
 
-## テンプレートから設定ファイルを生成する（op inject / 推奨）
+## 採用していないもの
 
-秘密入りの設定ファイルは、`{{ op://... }}` 参照だけのテンプレートをコミットし、
-実行時に `op inject` で解決する。実値は Nix store に焼かず `$HOME` 下にのみ出す。
-
-- テンプレート: `home/programs/1password/templates/example.yml.tpl`（参照のみ・コミット可）
-- 駆動: `flake.nix` の `apps.<system>.render-secrets`
-
-```bash
-eval "$(op signin)"        # 解錠
-nix run .#render-secrets   # 解決して ~/.config/example/config.yml を生成
-```
-
-新しい秘密はテンプレートに `{{ op://Vault/Item/field }}` を追記する。出力先や
-対象を変えるときは `flake.nix` の `apps.render-secrets` を調整する。`op inject -o`
-は既定で 0600 出力。生成物（実値入り）をリポジトリ内に出すなら `.gitignore` へ。
-
-## スコープ外（今回は入れていない）
-
-- **SSH エージェント / git コミット署名**: 鍵を保管庫に封印したまま使う純正
-  エージェントは、WSL では Windows デスクトップアプリ（`ssh.exe` 転送 +
-  `op-ssh-sign-wsl`）か WSL 内 Linux アプリが必要。要るときに別途追加する。
-- **sops-nix**: 1Password を秘密の根に据えるなら不要。秘密は `op read` で
-  直接取れるため、暗号鍵を二重管理するだけになる。
+- **SSH エージェント / git コミット署名**: WSL では Windows デスクトップアプリか
+  WSL 内 Linux アプリが必要なため、今回は入れていない。
+- **sops-nix**: 1Password を真実の源にするため不要。暗号化したファイルを git で
+  バージョン管理したい用途が出てきたら別途検討する。

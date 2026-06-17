@@ -47,23 +47,10 @@
                 };
             };
 
-            # 実値が world-readable な Nix store に入らないよう、ビルド時ではなく
-            # `nix run` 実行時に op inject で秘密参照テンプレートを解決する。
+            # 定義を分離して flake.nix を薄く保つ。一覧は home/programs/1password/secrets.nix。
             apps = forAllSystems (system:
-                let pkgs = pkgsFor system; in {
-                    render-secrets = {
-                        type = "app";
-                        program = "${pkgs.writeShellApplication {
-                            name = "render-secrets";
-                            runtimeInputs = [ pkgs._1password-cli ];
-                            text = ''
-                                mkdir -p "$HOME/.config/example"
-                                op inject -f \
-                                    -i ${./home/programs/1password/templates/example.yml.tpl} \
-                                    -o "$HOME/.config/example/config.yml"
-                            '';
-                        }}/bin/render-secrets";
-                    };
+                import ./home/programs/1password/render-secrets.nix {
+                    pkgs = pkgsFor system;
                 });
         };
 }
