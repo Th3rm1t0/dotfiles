@@ -18,8 +18,8 @@
         BROWSER = "wslview";
     };
 
-    programs.git.settings = {
-        # Avoid CRLF conversion issues in WSL
-        core.autocrlf = "input";
+    programs.git.settings.core = {
+        autocrlf = "input";
+        sshCommand = "ssh.exe";
     };
 }
