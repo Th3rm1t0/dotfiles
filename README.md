@@ -1,89 +1,83 @@
 # Dotfiles
 
-Nix flakes および home-manager をメインに使用している dotfiles リポジトリ
+Nix flakes と home-manager で管理する dotfiles リポジトリ。
 
-# 対応環境
+## 対応環境
 
 - Ubuntu on WSL2
-- Ubuntu Desktop(予定)
-- NixOS(予定)
+- Ubuntu Desktop（予定）
+- NixOS（予定）
 
-# セットアップ手順
+## セットアップ
 
-1. Nix をインストール
-```sh
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
-```
-※ OSによって違いがあるので詳細は [公式ドキュメント](https://nixos.org/download/)を参照
+1. Nix をインストールする。
 
-2. 
-```sh
-NIX_CONFIG="experimental-features = nix-command flakes" \
-nix run nixpkgs#home-manager -- switch --flake .#<username>@<hostname>
-```
+   ```sh
+   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+   ```
 
-<username> と <hostname> をそれぞれ指定の上で実行
+   OS ごとの差異は[公式ドキュメント](https://nixos.org/download/)を参照。
 
+2. home-manager で設定を適用する。
 
-# ディレクトリ構成
+   ```sh
+   NIX_CONFIG="experimental-features = nix-command flakes" \
+   nix run nixpkgs#home-manager -- switch --flake .#<username>@<hostname>
+   ```
 
-## flake.nix
+   `<username>` と `<hostname>` は環境に合わせて指定する。
 
-Nix flakes のエントリーポイントとして機能
-外部への依存 (nixpkgs や home-manager など) の宣言、および各ホストに対する設定のエクスポートを実施
-新規ホスト追加時には `homeConfigurations` に設定を追加する
+## ディレクトリ構成
 
-また `apps.<system>.render-secrets` を公開する。`nix run .#render-secrets` で、1Password の秘密参照テンプレート (`{{ op://... }}`) を実値の設定ファイルへ実行時解決する (詳細は `home/programs/1password/README.md`)
+### `flake.nix`
 
-## hosts/
+Nix flakes のエントリーポイント。
+外部依存（nixpkgs、home-manager など）の宣言と、各ホスト設定のエクスポートを行う。
+新規ホスト追加時は `homeConfigurations` にエントリを追加する。
 
-ホストマシンとユーザーの組み合わせ、およびそれらの組み合わせに紐付く設定を定義する
+`apps.<system>.render-secrets` も公開しており、`nix run .#render-secrets` で 1Password の秘密参照テンプレート（`{{ op://... }}`）を実値へ解決する。
+詳細は `home/programs/1password/README.md` を参照。
 
-`common.nix` で全ホスト共有の設定を定義し、各ホストファイル側ではその値を継承しつつ差分を上書きする形で定義する。
+### `hosts/`
 
-<例>
-- WSL において不要な設定を無効化
-- GUI系ツールはデスクトップ環境でのみ有効化
+ホストとユーザーの組み合わせごとの設定を定義する。
+`common.nix` に全ホスト共有の設定を置き、各ホストファイルで差分を上書きする。
 
-## home/
+### `home/`
 
-ユーザー環境設定を定義する
-ホームディレクトリに対して配置される各種設定ファイルの内容の定義を行う
+ユーザー環境の設定を定義する。
 
-`programs/` 配下は、アプリケーションごとにディレクトリを作成する。各ディレクトリには `default.nix` を配置し、必要に応じてエイリアス定義や生の設定ファイルを分離できる。
+- **`default.nix`**：エントリーポイント。各アプリケーションの設定をインポートし、home-manager の基本設定を行う
+- **`programs/`**：アプリケーションごとにディレクトリを作成し、それぞれ `default.nix` を配置する。home-manager の `programs.*` に対応
+- **`claude/`**：Claude の Agent Skill を宣言的に管理する。詳細は `home/claude/README.md` を参照
+- **`services/`**（予定）：バックグラウンドサービスの設定を定義する。home-manager の `services.*` に対応
 
-- `default.nix` : エントリーポイント。各種アプリケーション・ツールの設定情報のインポートと home-manager の基本設定を実施
-- `programs/` : 各アプリケーション・ツールの設定を定義。 home-manager の `programs.*` namespace に対応させている
-- `services/` : バックグラウンドで動作するサービスの設定を定義。 home-manager の `services.*` namespace に対応させている
+### `modules/`（予定）
 
-## modules/
+home-manager や NixOS の標準モジュールにない設定を追加するカスタムモジュールを定義する。
 
-再利用可能なカスタムモジュールを定義する
-home-manager や NixOS の標準モジュールに存在しない設定を追加したい場合に使用する
+### `pkgs/`（予定）
 
-- `home-manager/` : home-manager 用カスタムモジュール
+nixpkgs に存在しないパッケージや、特殊なビルド定義を必要とするパッケージを定義する。
+GitHub のみで公開されているツールの導入や、特定オプションを指定したビルドに使う。
 
-## pkgs/
+### `overlays/`（予定）
 
-nixpkgs に存在しないパッケージや、特殊なビルド定義を必要とするパッケージを定義する
-GitHub のみで公開されてるツールの導入や、特定のオプションを指定してビルドしたいパッケージなどの定義はここに追加する
+nixpkgs の既存パッケージに対するオーバーレイを定義する。
+バージョン固定、パッチ適用、unstable チャンネルからの部分取得に使う。
+`pkgs/` で定義したパッケージを nixpkgs に追加するオーバーレイもここで定義する。
 
-## overlays/
+### `lib/`（予定）
 
-nixpkgs の既存パッケージに対するオーバーレイを定義する
-主な用途は特定パッケージのバージョンの固定やパッチの適用、unstable チャンネルからの部分的なパッケージの取得などを想定
-また、pkgs/ 配下で定義したパッケージを nixpkgs に対して追加するオーバーレイもここで定義する
+ユーティリティ関数を定義する。
+共通化は、既存コードが十分に複雑で共通化の利点が上回る場合にのみ行う。
 
-## lib/
+## 参照の流れ
 
-ボイラープレートコードやユーティリティ関数を定義する
-認知的複雑度の観点もあるので、共通化に際しては既存のコードが十分に複雑であるかを考慮した上で、共通化のメリットの方が大きいと判断できる場合にのみ関数化する
-
-# 参照の流れ
 ```text
 flake.nix
 │
-│ homeConfigurations で指定した内容を参照
+│ homeConfigurations で参照
 ▼
 hosts/<hostname>.nix
 │
@@ -91,16 +85,18 @@ hosts/<hostname>.nix
 ▼
 hosts/common.nix
 │
-│ 各種アプリケーションの設定を参照
+│ アプリケーション設定を参照
 ▼
 home/default.nix
 │
-│ 各種アプリケーションの具体的な設定を参照
+│ 各プログラムの設定を参照
 ▼
-home/programs/* および home/services/*
+home/programs/*、home/services/*
 ```
 
-# 注意
-- Nix flakes は Git にコミットされているか、ステージングされた状態を参照してビルドするため、新規ファイルを追加した後は必ず `git add` を実行する
-- `home-manager switch` の前に `home-manager build` でビルドが成功することを確認することを推奨する
-- 設定変更後に問題が発生した場合は、`home-manager switch --rollback` で直前の状態に戻せる
+## 注意事項
+
+- Nix flakes は Git にコミットまたはステージングされたファイルだけを参照してビルドする。
+  新規ファイルは `git add` してからビルドすること。
+- `home-manager switch` の前に `home-manager build` で成功を確認するのを推奨する。
+- 問題発生時は `home-manager switch --rollback` で直前の世代に戻せる。
