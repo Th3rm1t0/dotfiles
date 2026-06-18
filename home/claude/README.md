@@ -14,27 +14,23 @@ claude-code パッケージの導入（`home/programs/claude-code`）とは別�
 
 ## 外部 skill の追加
 
-1. `flake.nix` の inputs に取り込み元を追加する（`inputs.nixpkgs.follows = "nixpkgs"`）。
-   flake でない配布なら `{ url = "..."; flake = false; }` とする。
+`default.nix` に source を宣言し、有効化する。
+`flake.nix` の `inputs` に追加する必要はない。
 
-2. `default.nix` に source を宣言する。
+```nix
+sources.japanese-techwriting = {
+  path = builtins.fetchGit {
+    url = "https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d";
+    rev = "5ed08e4475365fd233aa0d3ab71c19b87e1a5732";
+  };
+  filter.maxDepth = 1;
+};
 
-   ```nix
-   sources.anthropic = {
-     input    = "anthropic-skills";  # inputs のキー名
-     subdir   = "skills";
-     idPrefix = "anthropic";         # ID 衝突回避（pdf → anthropic/pdf）
-   };
-   ```
+skills.enableAll = [ "local" "japanese-techwriting" ];
+```
 
-3. 有効化する。
-
-   - 全ソース一括：`skills.enableAll = [ "local" "anthropic" ];`
-   - 個別指定：`skills.enable = [ "local/<id>" "anthropic/pdf" ];`
-
-source に `input` 参照を使うため、home-manager へ `extraSpecialArgs` で `inputs` を渡す必要がある。
-WSL は `flake.nix` で対応済み。
-NixOS ホストを追加する場合は `home-manager.extraSpecialArgs` で渡すこと。
+skill は Markdown であり、ビルド成果物の再現性が問題にならないため、`rev` 固定の `builtins.fetchGit` で十分である。
+`flake.nix` の `inputs` と `flake.lock` による管理は不要である。
 
 ## 配置方式
 
