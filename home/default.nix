@@ -16,6 +16,7 @@
         ./programs/hyperfine
         ./programs/gh
         ./programs/1password
+        ./programs/tmux
     ];
 
     programs.home-manager.enable = true;
