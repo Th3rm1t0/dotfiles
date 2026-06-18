@@ -11,7 +11,15 @@
       filter.maxDepth = 1;
     };
 
-    skills.enableAll = [ "local" ];
+    sources.japanese-techwriting = {
+      path = builtins.fetchGit {
+        url = "https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d";
+        rev = "5ed08e4475365fd233aa0d3ab71c19b87e1a5732";
+      };
+      filter.maxDepth = 1;
+    };
+
+    skills.enableAll = [ "local" "japanese-techwriting" ];
 
     targets.claude = {
       enable = true;
