@@ -14,6 +14,7 @@
         ./programs/btop
         ./programs/dust
         ./programs/hyperfine
+        ./programs/gh
         ./programs/1password
     ];
 
