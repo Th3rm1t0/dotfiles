@@ -2,7 +2,7 @@
 
 `op` CLI を導入し、1Password を秘密の唯一の真実源とする。
 平文の秘密は dotfiles にもコミットにも置かない。
-WSL でも Windows アプリに依存せず、Ubuntu 側だけで完結する。
+シークレットはファイルに書き出さず、実行時に 1Password から取得する。
 
 ## サインイン（初回のみ）
 
@@ -15,50 +15,74 @@ op whoami
 設定は `~/.config/op/` に保存され、以後はパスワードだけで解錠できる。
 デスクトップアプリは導入していないため、生体認証は使えない。
 
-## 秘密ファイルの宣言的な生成（render-secrets）
+## プラグインの設定（初回のみ）
 
-`{{ op://... }}` 参照だけのテンプレートを配置し、`nix run` で実値ファイルへ解決する。
-実値は Nix store に入れず、`$HOME` 下に 0600 で出力する。
-
-| ファイル | 役割 |
-|---|---|
-| `secrets.nix` | 管理対象の一覧（増やすのはここ） |
-| `templates/*.tpl` | `{{ op://Vault/Item/field }}` 入りの雛形 |
-| `render-secrets.nix` | 生成ロジック（通常は変更不要） |
-
-### 実行
+対応ツールごとに `op plugin init` を実行し、1Password の item と紐づける。
 
 ```bash
-eval "$(op signin)"
-nix run .#render-secrets   # 一覧の全テンプレートを実値ファイルへ生成
+op plugin init gh
+op plugin init aws
 ```
 
-### 秘密ファイルの追加
+対話的に vault と item を選択する。設定は `~/.config/op/plugins/` に保存される。
+対応ツールの一覧は `op plugin list` で確認できる。
 
-1. `templates/foo.tpl` を作る（中に `{{ op://Vault/Item/field }}` を記述）。
+## シークレットの取得方法
 
-2. `secrets.nix` に 1 行追加する。
+優先度順に使い分ける。
 
-   ```nix
-   { template = ./templates/foo.tpl; out = ".aws/credentials"; }
-   ```
+### 1. `op plugin` — CLI ツールの透過的ラップ
 
-   `out` は `$HOME` からの相対パス。
-   親ディレクトリは自動作成される。
-
-3. `git add` してから `nix run .#render-secrets` を実行する。
-
-参照先（vault、item、field）は 1Password に実在する必要がある。
-コミットするのはテンプレートと一覧だけであり、生成物（実値入り）はコミットしない。
-
-## その他の取得方法
+対応ツール（`gh`, `aws` など）は `op plugin` でシークレット注入を自動化できる。
 
 ```bash
-op read "op://Private/GitHub/token"     # 単発で 1 個だけ取得
-op run --env-file=.env -- <command>      # 環境変数で渡す（ファイルを作らない）
+op plugin init gh
+```
+
+設定後は `gh` を普通に実行するだけで 1Password からトークンが注入される。
+対応ツールの一覧は `op plugin list` で確認できる。
+
+### 2. アプリ固有の credential hook
+
+外部コマンドからの認証取得を公式にサポートするツールでは、`op read` を組み合わせる。
+
+```ini
+# ~/.aws/config の例
+[default]
+credential_process = op read "op://Vault/AWS/access-key" --format json
+```
+
+### 3. `op run` — 環境変数でコマンドに渡す
+
+ファイルを作らず、環境変数経由でシークレットを渡す。
+
+```bash
+op run --env-file=.env.tpl -- <command>
+```
+
+`.env.tpl` にはプレースホルダだけを記述する。
+
+```env
+API_KEY={{ op://Vault/Item/api-key }}
+DB_PASSWORD={{ op://Vault/Item/password }}
+```
+
+頻繁に使うコマンドは zsh の `shellAliases` でラップする。
+
+```nix
+shellAliases = {
+    myapp = ''op run --env-file="$HOME/.config/myapp/env.tpl" -- myapp'';
+};
+```
+
+### 4. `op read` — 単発で 1 個だけ取得
+
+```bash
+op read "op://Private/GitHub/token"
 ```
 
 ## 採用していないもの
 
+- **秘密ファイルの事前生成（`op inject`）**：HM の宣言的ライフサイクルに合わず、命令的な別ステップが必要になるため廃止した。
+- **sops-nix / agenix**：暗号化鍵のホスト間配布が必要になる。1Password を真実の源とするため不要。
 - **SSH エージェントと git コミット署名**：WSL では Windows デスクトップアプリか WSL 内 Linux アプリが必要なため、導入していない。
-- **sops-nix**：1Password を真実の源とするため不要。暗号化ファイルを git で管理したい用途が出た場合に検討する。

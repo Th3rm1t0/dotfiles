@@ -47,10 +47,5 @@
                 };
             };
 
-            # 定義を分離して flake.nix を薄く保つ。一覧は home/programs/1password/secrets.nix。
-            apps = forAllSystems (system:
-                import ./home/programs/1password/render-secrets.nix {
-                    pkgs = pkgsFor system;
-                });
         };
 }

@@ -35,7 +35,7 @@ Nix flakes のエントリーポイント。
 外部依存（nixpkgs、home-manager など）の宣言と、各ホスト設定のエクスポートを行う。
 新規ホスト追加時は `homeConfigurations` にエントリを追加する。
 
-`apps.<system>.render-secrets` も公開しており、`nix run .#render-secrets` で 1Password の秘密参照テンプレート（`{{ op://... }}`）を実値へ解決する。
+シークレットは 1Password CLI（`op`）を使い、実行時に取得する。
 詳細は `home/programs/1password/README.md` を参照。
 
 ### `hosts/`
