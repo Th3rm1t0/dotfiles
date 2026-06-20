@@ -10,22 +10,25 @@ Nix flakes と home-manager で管理する dotfiles リポジトリ。
 
 ## セットアップ
 
-1. Nix をインストールする。
+リポジトリをクローンし、`setup.sh` を実行する。
 
-   ```sh
-   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
-   ```
+```sh
+git clone https://github.com/Kyure-A/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./setup.sh
+```
 
-   OS ごとの差異は[公式ドキュメント](https://nixos.org/download/)を参照。
+`setup.sh` は以下を順に実行する。
 
-2. home-manager で設定を適用する。
+1. Nix が未インストールなら [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer) でインストールする
+2. `flake.nix` の `homeConfigurations` から設定名を検出し、`home-manager switch` で適用する
+3. zsh をデフォルトシェルに設定する
 
-   ```sh
-   NIX_CONFIG="experimental-features = nix-command flakes" \
-   nix run nixpkgs#home-manager -- switch --flake .#<username>@<hostname>
-   ```
+`homeConfigurations` が複数ある場合は引数で設定名を指定する。
 
-   `<username>` と `<hostname>` は環境に合わせて指定する。
+```sh
+./setup.sh th3rm1t3@ubuntu-wsl
+```
 
 ## ディレクトリ構成
 
