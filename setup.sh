@@ -33,6 +33,30 @@ resolve_config() {
     fi
 }
 
+setup_1password() {
+    if ! command -v op &>/dev/null; then
+        echo "op CLI not found, skipping 1Password setup."
+        return
+    fi
+    if op whoami &>/dev/null; then
+        echo "1Password: already signed in."
+    else
+        echo "1Password: signing in..."
+        op account add --address my.1password.com
+        eval "$(op signin)"
+    fi
+
+    local plugins=(gh aws)
+    for plugin in "${plugins[@]}"; do
+        if op plugin list 2>/dev/null | grep -q "$plugin"; then
+            echo "1Password plugin: ${plugin} already configured."
+        else
+            echo "1Password plugin: setting up ${plugin}..."
+            op plugin init "$plugin"
+        fi
+    done
+}
+
 set_default_shell_to_zsh() {
     local zsh_path
     zsh_path="$(command -v zsh 2>/dev/null || true)"
@@ -51,6 +75,7 @@ main() {
     echo "Applying: ${config}"
     nix run nixpkgs#home-manager -- switch --flake "${DOTFILES_DIR}#${config}"
 
+    setup_1password
     set_default_shell_to_zsh
 }
 

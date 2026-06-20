@@ -4,28 +4,12 @@
 平文の秘密は dotfiles にもコミットにも置かない。
 シークレットはファイルに書き出さず、実行時に 1Password から取得する。
 
-## サインイン（初回のみ）
+## 初期設定
 
-```bash
-op account add --address my.1password.com --email <メールアドレス>
-eval "$(op signin)"
-op whoami
-```
-
+サインインとプラグインの設定は `setup.sh` が実行する。
+対話的にメールアドレス、マスターパスワード、vault/item の選択を求められる。
 設定は `~/.config/op/` に保存され、以後はパスワードだけで解錠できる。
 デスクトップアプリは導入していないため、生体認証は使えない。
-
-## プラグインの設定（初回のみ）
-
-対応ツールごとに `op plugin init` を実行し、1Password の item と紐づける。
-
-```bash
-op plugin init gh
-op plugin init aws
-```
-
-対話的に vault と item を選択する。設定は `~/.config/op/plugins/` に保存される。
-対応ツールの一覧は `op plugin list` で確認できる。
 
 ## シークレットの取得方法
 
