@@ -41,8 +41,9 @@ setup_1password() {
     if op whoami &>/dev/null; then
         echo "1Password: already signed in."
     else
-        echo "1Password: signing in..."
-        op account add --address my.1password.com
+        if ! op account list 2>/dev/null | grep -q my.1password.com; then
+            op account add --address my.1password.com
+        fi
         eval "$(op signin)"
     fi
 
