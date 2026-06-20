@@ -19,7 +19,15 @@
       filter.maxDepth = 1;
     };
 
-    skills.enableAll = [ "local" "japanese-techwriting" ];
+    sources.karpathy-guidelines = {
+      path = "${builtins.fetchGit {
+        url = "https://github.com/multica-ai/andrej-karpathy-skills";
+        rev = "2c606141936f1eeef17fa3043a72095b4765b9c2";
+      }}/skills";
+      filter.maxDepth = 1;
+    };
+
+    skills.enableAll = [ "local" "japanese-techwriting" "karpathy-guidelines" ];
 
     targets.claude = {
       enable = true;
