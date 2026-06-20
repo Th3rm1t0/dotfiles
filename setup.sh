@@ -47,7 +47,7 @@ setup_1password() {
         eval "$(op signin)"
     fi
 
-    local plugins=(gh aws)
+    local plugins=(gh)
     for plugin in "${plugins[@]}"; do
         if op plugin list 2>/dev/null | grep -q "$plugin"; then
             echo "1Password plugin: ${plugin} already configured."

@@ -22,7 +22,7 @@ cd ~/dotfiles
 
 1. Nix が未インストールなら [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer) でインストールする
 2. `flake.nix` の `homeConfigurations` から設定名を検出し、`home-manager switch` で適用する
-3. 1Password CLI のサインインとプラグイン（`gh`, `aws`）の設定を行う
+3. 1Password CLI のサインインとプラグイン（`gh`）の設定を行う
 4. zsh をデフォルトシェルに設定する
 
 `homeConfigurations` が複数ある場合は引数で設定名を指定する。
