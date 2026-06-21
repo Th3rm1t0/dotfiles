@@ -3,6 +3,7 @@
     "agent-skills": {
       "inputs": {
         "agent-skills": "agent-skills_2",
+        "anthropic": "anthropic",
         "japanese-techwriting": "japanese-techwriting",
         "karpathy-guidelines": "karpathy-guidelines",
         "ui-skills": "ui-skills",
@@ -35,6 +36,22 @@
       "original": {
         "owner": "Kyure-A",
         "repo": "agent-skills-nix",
+        "type": "github"
+      }
+    },
+    "anthropic": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781037316,
+        "narHash": "sha256-1D9otXxDvmKASBu/vtAEWv6kE+U+jG4OxZpRLZbGEF0=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "57546260929473d4e0d1c1bb75297be2fdfa1949",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
         "type": "github"
       }
     },

@@ -6,6 +6,7 @@
   vercel-agent-skills,
   vercel-skills,
   ui-skills,
+  anthropic,
   ...
 }:
 
@@ -40,6 +41,11 @@ let
       path = ui-skills;
       subdir = "skills";
     };
+
+    anthropic = {
+      path = anthropic;
+      subdir = "skills";
+    };
   };
 in
 {
@@ -56,7 +62,37 @@ in
     enable = true;
     inherit sources;
 
-    skills.enableAll = builtins.attrNames sources;
+    skills.enable = [
+      # ── 日本語・ライティング ──
+      "japanese-techwriting"
+
+      # ── コーディング規範 ──
+      "karpathy-guidelines"
+
+      # ── Vercel / React / Next.js ──
+      "composition-patterns"
+      "deploy-to-vercel"
+      "find-skills"
+      "react-best-practices"
+      "react-native-skills"
+      "react-view-transitions"
+
+      # ── UI / デザイン ──
+      "baseline-ui"
+      "fixing-accessibility"
+      "fixing-metadata"
+      "fixing-motion-performance"
+      "ui-skills-root"
+      "web-design-guidelines"
+      "writing-guidelines"
+
+      # ── Anthropic 公式 ──
+      "claude-api"
+      "doc-coauthoring"
+      "mcp-builder"
+      "pdf"
+      "skill-creator"
+    ];
 
     targets.claude = {
       enable = true;

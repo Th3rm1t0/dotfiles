@@ -23,6 +23,10 @@
       url = "github:ibelick/ui-skills";
       flake = false;
     };
+    anthropic = {
+      url = "github:anthropics/skills";
+      flake = false;
+    };
   };
 
   outputs =
@@ -34,6 +38,7 @@
       vercel-agent-skills,
       vercel-skills,
       ui-skills,
+      anthropic,
       ...
     }:
     {
@@ -49,6 +54,7 @@
               vercel-agent-skills
               vercel-skills
               ui-skills
+              anthropic
               ;
           }
         );
