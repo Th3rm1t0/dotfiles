@@ -7,30 +7,35 @@ claude-code パッケージの導入（`home/programs/claude-code`）とは別�
 パッケージ追従は overlay の技術的関心であり、skill は自分で書くコンテンツでライフサイクルが異なるためである。
 加えて、skill は複数のエージェントが共有で読む資産でもある。
 
+## 構成
+
+skill ソースは `inputs/skills/` にサブ flake として分離し、各リポジトリを flake input で宣言している。
+バージョンは `inputs/skills/flake.lock` で固定され、`nix flake update --flake ./inputs/skills` で一括更新できる。
+
+このモジュール（`home/claude/default.nix`）はサブ flake の home-manager モジュールを import するだけの薄いラッパーである。
+
 ## ローカル skill の追加
 
-`skills/<name>/SKILL.md` を作って `git add` する。
-`skills.enableAll = [ "local" ]` により自動で有効化され、`~/.claude/skills/<name>/` へ store symlink で配置される。
+`inputs/skills/local/<name>/SKILL.md` を作って `git add` する。
+`enableAll` もしくは `skills.enable` リストへの追加により有効化され、`~/.claude/skills/<name>/` へ store symlink で配置される。
 
 ## 外部 skill の追加
 
-`default.nix` に source を宣言し、有効化する。
-`flake.nix` の `inputs` に追加する必要はない。
+`inputs/skills/flake.nix` に flake input を追加し、`inputs/skills/default.nix` の `sources` に宣言する。
 
 ```nix
-sources.japanese-techwriting = {
-  path = builtins.fetchGit {
-    url = "https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d";
-    rev = "5ed08e4475365fd233aa0d3ab71c19b87e1a5732";
-  };
-  filter.maxDepth = 1;
+# flake.nix
+new-skill = {
+  url = "github:owner/repo";
+  flake = false;
 };
 
-skills.enableAll = [ "local" "japanese-techwriting" ];
+# default.nix
+sources.new-skill = {
+  path = new-skill;
+  subdir = "skills";
+};
 ```
-
-skill は Markdown であり、ビルド成果物の再現性が問題にならないため、`rev` 固定の `builtins.fetchGit` で十分である。
-`flake.nix` の `inputs` と `flake.lock` による管理は不要である。
 
 ## 配置方式
 
