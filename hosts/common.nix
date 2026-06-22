@@ -25,6 +25,7 @@
         curl
         wget
         git
+        just
 
         ripgrep
         fd
