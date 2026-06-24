@@ -31,6 +31,28 @@ cd ~/dotfiles
 ./setup.sh th3rm1t3@ubuntu-wsl
 ```
 
+## 開発環境
+
+devShell に nixfmt・deadnix・statix・just を含む。
+direnv が有効な環境ではリポジトリに `cd` するだけで自動ロードされる。
+
+```sh
+direnv allow   # 初回のみ
+```
+
+### just レシピ
+
+| コマンド | 内容 |
+|----------|------|
+| `just build` | home-manager build |
+| `just switch` | home-manager switch |
+| `just update` | flake.lock を更新 |
+| `just gc` | Nix ストアのガベージコレクション |
+| `just check` | nix flake check |
+| `just fmt` | nixfmt でフォーマット |
+| `just lint` | deadnix + statix で警告表示 |
+| `just fix` | deadnix + statix の自動修正 + フォーマット |
+
 ## ディレクトリ構成
 
 ### `flake.nix`
@@ -51,25 +73,24 @@ Nix flakes のエントリーポイント。
 
 ユーザー環境の設定を定義する。
 
-- **`default.nix`**：エントリーポイント。各アプリケーションの設定をインポートし、home-manager の基本設定を行う
-- **`programs/`**：アプリケーションごとにディレクトリを作成し、それぞれ `default.nix` を配置する。home-manager の `programs.*` に対応
+- **`default.nix`**：エントリーポイント。`programs/` 配下のディレクトリを自動探索してインポートする
+- **`programs/`**：アプリケーションごとにディレクトリを作成し、それぞれ `default.nix` を配置する。各モジュールは `dotfiles.programs.<name>.enable` オプションを持ち、ホスト設定から個別に有効/無効を切り替えられる（デフォルトは有効）
 - **`claude/`**：Claude の Agent Skill を宣言的に管理する。詳細は `home/claude/README.md` を参照
 - **`services/`**（予定）：バックグラウンドサービスの設定を定義する。home-manager の `services.*` に対応
 
-### `modules/`（予定）
+### `overlays/`
 
-home-manager や NixOS の標準モジュールにない設定を追加するカスタムモジュールを定義する。
+nixpkgs の既存パッケージに対するオーバーレイを定義する。
+外部 flake の overlay 集約、バージョン固定、パッチ適用に使う。
 
-### `pkgs/`（予定）
+### `pkgs/`
 
 nixpkgs に存在しないパッケージや、特殊なビルド定義を必要とするパッケージを定義する。
 GitHub のみで公開されているツールの導入や、特定オプションを指定したビルドに使う。
 
-### `overlays/`（予定）
+### `modules/`（予定）
 
-nixpkgs の既存パッケージに対するオーバーレイを定義する。
-バージョン固定、パッチ適用、unstable チャンネルからの部分取得に使う。
-`pkgs/` で定義したパッケージを nixpkgs に追加するオーバーレイもここで定義する。
+home-manager や NixOS の標準モジュールにない設定を追加するカスタムモジュールを定義する。
 
 ### `lib/`（予定）
 
@@ -93,7 +114,7 @@ hosts/common.nix
 ▼
 home/default.nix
 │
-│ 各プログラムの設定を参照
+│ programs/ を自動探索
 ▼
 home/programs/*、home/services/*
 ```
