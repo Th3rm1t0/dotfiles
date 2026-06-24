@@ -69,6 +69,34 @@
         }
       );
 
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          formatting =
+            pkgs.runCommand "check-formatting"
+              {
+                nativeBuildInputs = [
+                  pkgs.nixfmt
+                  pkgs.findutils
+                ];
+              }
+              ''
+                find ${self} -name '*.nix' -exec nixfmt --check {} + && touch $out
+              '';
+
+          deadnix = pkgs.runCommand "check-deadnix" { nativeBuildInputs = [ pkgs.deadnix ]; } ''
+            deadnix --fail --exclude .claude ${self} && touch $out
+          '';
+
+          statix = pkgs.runCommand "check-statix" { nativeBuildInputs = [ pkgs.statix ]; } ''
+            statix check --ignore [".claude/"] ${self} && touch $out
+          '';
+        }
+      );
+
       homeConfigurations = {
         "th3rm1t3@ubuntu-wsl" = lib.mkHome { hostname = "ubuntu-wsl"; };
       };

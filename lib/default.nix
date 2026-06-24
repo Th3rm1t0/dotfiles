@@ -9,7 +9,10 @@
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsFor system;
-      extraSpecialArgs = { inherit inputs; self = inputs.self; };
+      extraSpecialArgs = {
+        inherit inputs;
+        self = inputs.self;
+      };
       modules = [
         inputs.catppuccin.homeManagerModules.catppuccin
         ../hosts/${hostname}.nix

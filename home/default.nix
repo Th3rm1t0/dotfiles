@@ -13,7 +13,8 @@ in
 {
   imports = [
     inputs.agent-skills.homeManagerModules.default
-  ] ++ map (name: ./programs/${name}) programDirs;
+  ]
+  ++ map (name: ./programs/${name}) programDirs;
 
   programs.home-manager.enable = true;
 
