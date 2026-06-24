@@ -19,3 +19,16 @@ jobs:
           purge-prefixes: nix-${{ runner.os }}-
           purge-last-accessed: P7D
       - run: nix flake check
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          gc-max-store-size-linux: 1G
+      - run: nix build .#homeConfigurations.th3rm1t3@ubuntu-wsl.activationPackage
