@@ -1,8 +1,13 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
-    ./claude
+    inputs.agent-skills.homeManagerModules.default
     ./programs/claude-code
     ./programs/hermes-agent
     ./programs/fzf
