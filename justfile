@@ -22,3 +22,12 @@ check:
 
 fmt:
     nix fmt
+
+lint:
+    deadnix --exclude .claude .
+    statix check --ignore [".claude/"]
+
+fix:
+    deadnix -e --exclude .claude .
+    statix fix --ignore [".claude/"]
+    nix fmt
