@@ -1,234 +1,197 @@
 # AGENTS.md
 
-このドキュメントは、AI エージェントがこの dotfiles リポジトリで作業する際のガイドラインを定義する。Nix flakes と home-manager を使用した dotfiles 管理のベストプラクティスに基づいている。
+このドキュメントは、AI エージェントがこの dotfiles リポジトリで作業する際のガイドラインを定義する。
 
 ## プロジェクト概要
 
-このリポジトリは Nix flakes と home-manager を使用して、複数環境（Linux/WSL）のユーザー環境を宣言的に管理する。
+Nix flakes と home-manager を使用して、複数環境のユーザー環境を宣言的に管理するリポジトリ。
 
 ### 技術スタック
 
 - **Nix flakes**: 依存関係の固定と再現性の保証
-- **home-manager**: ユーザー環境（dotfiles、パッケージ）の宣言的管理
-- **対象環境**: Linux (Ubuntu)、WSL
+- **home-manager** (standalone): ユーザー環境の宣言的管理
+- **just**: タスクランナー
+- **direnv + nix-direnv**: 開発環境の自動ロード
+- **GitHub Actions**: CI（flake check、flake.lock 自動更新）
+
+### 対象環境
+
+- Ubuntu on WSL2
+- Ubuntu Desktop（予定）
+- NixOS（予定）
 
 ## ディレクトリ構造と役割
+
 ```
 .
-├── flake.nix           # エントリポイント：入力と出力の定義
+├── flake.nix           # エントリポイント：inputs / outputs の定義
 ├── flake.lock          # 依存関係のロックファイル（自動生成）
-├── home/               # ユーザー環境設定の本体
-│   ├── default.nix     # home/ のエントリポイント
-│   ├── claude/         # Claude skill 管理（agent-skills-nix。programs と分離）
-│   ├── programs/       # アプリケーション設定（programs.* に対応）
-│   └── services/       # サービス設定（services.* に対応）
+├── justfile            # タスクランナーのレシピ定義
+├── .envrc              # direnv 設定（use flake）
 ├── hosts/              # ホスト固有の設定
 │   ├── common.nix      # 全ホスト共通設定
 │   └── <hostname>.nix  # 各ホストの設定
-├── modules/            # カスタムモジュール
-│   ├── home-manager/   # home-manager 用カスタムモジュール
-│   └── nixos/          # NixOS 用カスタムモジュール（将来用）
+├── home/               # ユーザー環境設定の本体
+│   ├── default.nix     # エントリポイント（programs/ を自動探索）
+│   ├── programs/       # アプリケーション設定（1 アプリ 1 ディレクトリ）
+│   └── claude/         # Claude の Agent Skill 管理（agent-skills-nix）
+├── overlays/           # nixpkgs のオーバーレイ（外部 flake の overlay 集約）
+│   └── default.nix
 ├── pkgs/               # カスタムパッケージ定義
-├── overlays/           # nixpkgs の上書き・拡張
-└── lib/                # ヘルパー関数
+│   └── default.nix
+├── inputs/
+│   └── skills/         # Agent Skills 用サブ flake
+└── .github/workflows/  # CI ワークフロー
+    ├── check.yml       # push/PR 時の flake check
+    └── update.yml      # flake.lock の週次自動更新
 ```
 
 ## 重要な規則
 
 ### Git 追跡の必須化
 
-Nix flakes は Git で追跡されているファイルのみを認識する。新規ファイル作成後は必ず `git add` を実行すること。これを怠ると以下のエラーが発生する：
-```
-error: getting status of '/nix/store/...-source/flake.nix': No such file or directory
-```
+Nix flakes は Git で追跡されているファイルのみを認識する。新規ファイル作成後は必ず `git add` を実行すること。
 
-### ファイル作成・変更時の手順
+### inputs.nixpkgs.follows の統一
 
-1. ファイルを作成または編集
-2. `git add <ファイル>` で追跡対象に追加
-3. `nix build` または `home-manager build` でビルド確認
-4. 問題なければ `home-manager switch` で適用
+外部 flake を inputs に追加する際は、nixpkgs を follows させてバージョンを統一する：
 
-### inputs.nixpkgs.follows の使用
-
-home-manager の nixpkgs バージョンを flake の nixpkgs と一致させること。これにより依存関係の不整合を防ぐ：
 ```nix
-home-manager = {
-  url = "github:nix-community/home-manager";
-  inputs.nixpkgs.follows = "nixpkgs";  # 必須
+some-flake = {
+  url = "github:owner/repo";
+  inputs.nixpkgs.follows = "nixpkgs";
 };
 ```
 
-## 設定の書き方
+追加前に `nix flake metadata` で対象 flake が nixpkgs input を持っているか確認すること。
+
+### コメントポリシー
+
+コメントは Why のみ記述する。What や How はコードから読み取れるため書かない。
+
+### コミットメッセージ
+
+- 内部的なタスク参照やトラッキング番号（G1, G3 等）を含めない
+- 変更内容そのものを簡潔に日本語で記述する
+
+## モジュールの構造
+
+### enable オプション
+
+各プログラムモジュールは `dotfiles.programs.<name>.enable` オプションを持つ。デフォルトは `true`。ホスト設定から無効化できる：
+
+```nix
+# hosts/<hostname>.nix で特定プログラムを無効化
+dotfiles.programs.lazygit.enable = false;
+```
+
+### モジュールのテンプレート
+
+```nix
+# home/programs/<name>/default.nix
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+{
+  options.dotfiles.programs.<name>.enable = lib.mkEnableOption "<name>" // {
+    default = true;
+  };
+
+  config = lib.mkIf config.dotfiles.programs.<name>.enable {
+    # 設定内容
+  };
+}
+```
+
+### 自動探索
+
+`home/default.nix` は `programs/` 配下のディレクトリを `builtins.readDir` で自動探索する。新しいプログラムは `home/programs/<name>/default.nix` を作成して `git add` するだけで認識される。`home/default.nix` の編集は不要。
 
 ### programs.* vs xdg.configFile の使い分け
 
-home-manager には2つの設定アプローチがある：
+- **programs.***：home-manager がそのプログラムのオプションを提供している場合
+- **xdg.configFile / home.file**：home-manager がサポートしていない場合、または既存の設定ファイルをそのまま使いたい場合
 
-#### programs.* を使用すべき場合
+## overlay とカスタムパッケージ
 
-- home-manager がそのプログラムのオプションを提供している場合
-- Nix の型チェックや補完の恩恵を受けたい場合
-- 設定の抽象化や条件分岐が必要な場合
+### overlay の追加
+
+外部 flake の overlay は `overlays/default.nix` に集約する。`flake.nix` の `pkgsFor` で全 overlay を一括適用するため、個別モジュールでの `nixpkgs.overlays` 設定は不要：
+
 ```nix
-programs.git = {
-  enable = true;
-  userName = "Your Name";
-  userEmail = "you@example.com";
-  delta.enable = true;
-};
+# overlays/default.nix
+{ inputs, ... }:
+{
+  some-package = inputs.some-flake.overlays.default;
+}
 ```
 
-#### xdg.configFile / home.file を使用すべき場合
+### カスタムパッケージの追加
 
-- home-manager がそのプログラムをサポートしていない場合
-- 既存の設定ファイルをそのまま使いたい場合
-- 設定ファイルの形式（Lua、TOML等）を維持したい場合
+nixpkgs に存在しないパッケージは `pkgs/` に定義する：
+
 ```nix
-xdg.configFile."wezterm/wezterm.lua".source = ./wezterm.lua;
+# pkgs/my-tool/default.nix
+{ stdenv, fetchFromGitHub }:
+stdenv.mkDerivation { ... }
+
+# pkgs/default.nix
+pkgs: {
+  my-tool = pkgs.callPackage ./my-tool { };
+}
 ```
-
-#### ハイブリッドアプローチ
-
-複雑なプログラム（neovim 等）では両方を組み合わせる：
-```nix
-programs.neovim = {
-  enable = true;
-  extraPackages = with pkgs; [ nil lua-language-server ];
-};
-
-xdg.configFile = {
-  "nvim/init.lua".source = ./config/init.lua;
-  "nvim/lua".source = ./config/lua;
-};
-```
-
-### モジュール分割の指針
-
-設定が以下の条件を満たす場合、独立したファイルに分割する：
-
-- 20行以上の設定がある
-- 複数のオプションや依存パッケージを持つ
-- 他のホストで有効/無効を切り替える可能性がある
-
-分割時は `home/programs/<name>/default.nix` に配置する。
 
 ## コマンドリファレンス
 
-### ビルドと適用
-```bash
-# ビルドのみ（適用しない）- 変更確認に使用
-home-manager build --flake .#<user>@<host>
+日常の操作は justfile で抽象化されている：
 
-# ビルドして適用
-home-manager switch --flake .#<user>@<host>
-
-# 生成されたファイルの確認
-ls -la ./result/home-files/
-```
-
-### 依存関係の管理
-```bash
-# flake.lock の更新
-nix flake update
-
-# 特定の入力のみ更新
-nix flake lock --update-input nixpkgs
-
-# flake の情報確認
-nix flake show
-nix flake metadata
-```
-
-### トラブルシューティング
-```bash
-# 過去の世代を確認
-home-manager generations
-
-# ロールバック
-home-manager switch --rollback
-
-# ガベージコレクション
-nix-collect-garbage -d
-```
+| コマンド | 内容 |
+|----------|------|
+| `just build` | ビルドのみ（適用しない） |
+| `just switch` | ビルドして適用 |
+| `just update` | flake.lock を更新 |
+| `just gc` | Nix ストアのガベージコレクション |
+| `just check` | nix flake check |
+| `just fmt` | nixfmt でフォーマット |
+| `just lint` | deadnix + statix で警告表示 |
+| `just fix` | deadnix + statix の自動修正 + フォーマット |
 
 ## 新規追加の手順
 
-### 新しいホストを追加する場合
-
-1. `hosts/<hostname>.nix` を作成
-2. `common.nix` をインポートし、ホスト固有設定を記述
-3. `flake.nix` の `homeConfigurations` に追加：
-```nix
-homeConfigurations."<user>@<hostname>" = home-manager.lib.homeManagerConfiguration {
-  pkgs = pkgsFor "x86_64-linux";
-  modules = [ ./hosts/<hostname>.nix ];
-};
-```
-
-4. `git add` してビルド確認
-
 ### 新しいプログラムを追加する場合
 
-1. `home/programs/<name>/default.nix` を作成
-2. home-manager オプションまたは xdg.configFile で設定
-3. `home/default.nix` の imports に追加
+1. `home/programs/<name>/default.nix` を作成（テンプレートに従い enable オプションを含める）
+2. `git add home/programs/<name>/`
+3. `just build` でビルド確認
+
+### 新しいホストを追加する場合
+
+1. `hosts/<hostname>.nix` を作成し、`common.nix` をインポート
+2. `flake.nix` の `homeConfigurations` にエントリを追加
+3. 必要に応じて `dotfiles.programs.<name>.enable = false;` でモジュールを無効化
 4. `git add` してビルド確認
-
-### カスタムモジュールを追加する場合
-
-1. `modules/home-manager/<name>.nix` を作成
-2. `options` と `config` を定義
-3. `modules/home-manager/default.nix` でエクスポート
-4. 使用する hosts ファイルでインポート
 
 ## よくある問題と解決策
 
-### "file not found" エラー
+### "file not found" / "is not tracked by Git" エラー
 
-原因: ファイルが Git で追跡されていない
-
-解決:
-```bash
-git add -A
-```
+新規ファイルが `git add` されていない。`git add <ファイル>` で解決。
 
 ### "infinite recursion" エラー
 
-原因: モジュール間の循環参照
-
-解決:
-- `lib.mkDefault` や `lib.mkForce` で優先度を明示
-- imports の構造を見直し、循環を排除
+モジュール間の循環参照。`lib.mkDefault` や `lib.mkForce` で優先度を明示するか、imports の構造を見直す。
 
 ### "collision" エラー（ファイル衝突）
 
-原因: 既存ファイルと home-manager 生成ファイルの競合
-
-解決:
-```bash
-# 既存ファイルをバックアップして削除
-mv ~/.config/<file> ~/.config/<file>.bak
-home-manager switch --flake .#<user>@<host>
-```
+既存ファイルと home-manager 生成ファイルの競合。既存ファイルをバックアップして削除する。
 
 ### 設定変更が反映されない
 
-原因: Nix store のキャッシュ
-
-解決:
-```bash
-# 明示的に再ビルド
-home-manager switch --flake .#<user>@<host> --recreate-lock-file
-```
-
-## コーディング規約
-
-### ファイル命名規則
-
-- Nix ファイル: `kebab-case.nix` または `default.nix`
-- ディレクトリ: `kebab-case`
-- 設定ファイル: 元のプログラムの規約に従う
+シェルの再起動が必要な場合がある（特に direnv のフック追加後など）。
 
 ## 参考リソース
 
@@ -237,7 +200,3 @@ home-manager switch --flake .#<user>@<host> --recreate-lock-file
 - [NixOS & Flakes Book](https://nixos-and-flakes.thiscute.world/)
 - [Nix Flakes Wiki](https://wiki.nixos.org/wiki/Flakes)
 - [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs)
-
-## 変更履歴
-
-このドキュメントは dotfiles リポジトリの進化に合わせて更新される。大きな構造変更があった場合は、このファイルも併せて更新すること。
