@@ -38,10 +38,13 @@
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-          # overlays = builtins.attrValues self.overlays;
+          overlays = builtins.attrValues self.overlays;
         };
     in
     {
+      overlays = import ./overlays { inherit inputs; };
+
+      packages = forAllSystems (system: import ./pkgs (pkgsFor system));
       formatter = forAllSystems (system: (pkgsFor system).nixfmt);
 
       devShells = forAllSystems (
@@ -61,13 +64,6 @@
         }
       );
 
-      # Custom packages
-      # packages = forAllSystems (system: import ./pkgs (pkgsFor system));
-
-      # Overlays
-      # overlays = import ./overlays { inherit inputs; };
-
-      # home-manager
       homeConfigurations = {
         "th3rm1t3@ubuntu-wsl" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";

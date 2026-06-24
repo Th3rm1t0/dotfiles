@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  inputs,
   pkgs,
   ...
 }:
@@ -12,7 +11,6 @@
   };
 
   config = lib.mkIf config.dotfiles.programs.claude-code.enable {
-    nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
     home.packages = [ pkgs.claude-code ];
   };
 }
