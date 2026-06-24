@@ -37,9 +37,27 @@ nix run github:Th3rm1t0/dotfiles -- th3rm1t3@ubuntu-wsl
 初回の適用時に以下が自動で行われる：
 
 - zsh がデフォルトシェルに設定される（sudo を要求）
-- 1Password shell-plugins が有効化される（`op signin` は別途手動で実行）
+- 1Password shell-plugins のシェルラッパーが有効化される
 
-### 3. リポジトリをクローン（日常操作用）
+適用後、シェルを再起動する。
+
+### 3. 1Password CLI のセットアップ
+
+1Password shell-plugins は宣言的に管理されているため、`op plugin init` は不要。
+アカウント登録とサインインだけ手動で行う。
+
+```sh
+op account add --address my.1password.com
+eval "$(op signin)"
+```
+
+サインイン後、`gh` を初回実行すると vault アイテムの選択を求められる。画面の指示に従って GitHub の認証情報を紐付ける。
+
+```sh
+gh auth status
+```
+
+### 4. リポジトリをクローン（日常操作用）
 
 ```sh
 git clone https://github.com/Th3rm1t0/dotfiles.git ~/dotfiles
