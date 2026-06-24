@@ -59,7 +59,7 @@ direnv allow   # 初回のみ
 
 Nix flakes のエントリーポイント。
 外部依存（nixpkgs、home-manager など）の宣言と、各ホスト設定のエクスポートを行う。
-新規ホスト追加時は `homeConfigurations` にエントリを追加する。
+新規ホスト追加時は `hosts/<hostname>.nix` を作成し、`lib.mkHome` で 1 行追加する。
 
 シークレットは 1Password CLI（`op`）を使い、実行時に取得する。
 詳細は `home/programs/1password/README.md` を参照。
@@ -92,17 +92,16 @@ GitHub のみで公開されているツールの導入や、特定オプショ�
 
 home-manager や NixOS の標準モジュールにない設定を追加するカスタムモジュールを定義する。
 
-### `lib/`（予定）
+### `lib/`
 
-ユーティリティ関数を定義する。
-共通化は、既存コードが十分に複雑で共通化の利点が上回る場合にのみ行う。
+ヘルパー関数を定義する。`mkHome` でホスト定義のボイラープレートを削減している。
 
 ## 参照の流れ
 
 ```text
 flake.nix
 │
-│ homeConfigurations で参照
+│ lib.mkHome で参照
 ▼
 hosts/<hostname>.nix
 │

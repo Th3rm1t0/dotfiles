@@ -35,6 +35,8 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 │   ├── default.nix     # エントリポイント（programs/ を自動探索）
 │   ├── programs/       # アプリケーション設定（1 アプリ 1 ディレクトリ）
 │   └── claude/         # Claude の Agent Skill 管理（agent-skills-nix）
+├── lib/                # ヘルパー関数（mkHome 等）
+│   └── default.nix
 ├── overlays/           # nixpkgs のオーバーレイ（外部 flake の overlay 集約）
 │   └── default.nix
 ├── pkgs/               # カスタムパッケージ定義
@@ -171,7 +173,10 @@ pkgs: {
 ### 新しいホストを追加する場合
 
 1. `hosts/<hostname>.nix` を作成し、`common.nix` をインポート
-2. `flake.nix` の `homeConfigurations` にエントリを追加
+2. `flake.nix` の `homeConfigurations` に `lib.mkHome` で 1 行追加：
+```nix
+"<user>@<hostname>" = lib.mkHome { hostname = "<hostname>"; };
+```
 3. 必要に応じて `dotfiles.programs.<name>.enable = false;` でモジュールを無効化
 4. `git add` してビルド確認
 

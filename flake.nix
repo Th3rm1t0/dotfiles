@@ -40,6 +40,7 @@
           config.allowUnfree = true;
           overlays = builtins.attrValues self.overlays;
         };
+      lib = import ./lib { inherit inputs pkgsFor; };
     in
     {
       overlays = import ./overlays { inherit inputs; };
@@ -65,13 +66,7 @@
       );
 
       homeConfigurations = {
-        "th3rm1t3@ubuntu-wsl" = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
-          extraSpecialArgs = { inherit inputs self; };
-          modules = [
-            ./hosts/ubuntu-wsl.nix
-          ];
-        };
+        "th3rm1t3@ubuntu-wsl" = lib.mkHome { hostname = "ubuntu-wsl"; };
       };
 
     };
