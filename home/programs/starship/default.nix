@@ -25,11 +25,14 @@
           style = "bold lavender";
         };
 
-        git_branch.style = "bold mauve";
+        git_branch = {
+          symbol = "";
+          style = "bold mauve";
+        };
 
         nix_shell = {
-          symbol = " ";
-          format = "via [$symbol$state( \($name\))](bold blue) ";
+          symbol = "󱄅";
+          format = "via [$symbol $state( \($name\))](bold blue) ";
         };
       };
     };
