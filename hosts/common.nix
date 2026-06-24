@@ -7,6 +7,12 @@
 
   home.stateVersion = "24.05";
 
+  catppuccin = {
+    enable = true;
+    flavor = "mocha";
+    accent = "blue";
+  };
+
   targets.genericLinux.enable = true;
 
   # XDG Base Directory

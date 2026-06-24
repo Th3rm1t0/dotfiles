@@ -55,6 +55,26 @@
         "type": "github"
       }
     },
+    "catppuccin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782117778,
+        "narHash": "sha256-x6vIJpJziw3Hs0JKKDP+AeRPWwqyMDOmK6I26tqbYj4=",
+        "owner": "catppuccin",
+        "repo": "nix",
+        "rev": "e98afe2dfd950bda4e6a8ef32bb563ec2f04505a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "nix",
+        "type": "github"
+      }
+    },
     "claude-code": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -358,6 +378,7 @@
     "root": {
       "inputs": {
         "agent-skills": "agent-skills",
+        "catppuccin": "catppuccin",
         "claude-code": "claude-code",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager_2",

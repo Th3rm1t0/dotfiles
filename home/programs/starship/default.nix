@@ -10,12 +10,14 @@
   };
 
   config = lib.mkIf config.dotfiles.programs.starship.enable {
+    catppuccin.starship.enable = false;
+
     programs.starship = {
       enable = true;
       enableZshIntegration = true;
 
       settings = {
-        format = "[░▒▓](#a3aed2)[  ](bg:#a3aed2 fg:#090c0c)[](bg:#769ff0 fg:#a3aed2)$directory[](fg:#769ff0 bg:#394260)$git_branch$git_status[](fg:#394260 bg:#212736)$nodejs$rust$golang$php[](fg:#212736 bg:#1d2230)$time[ ](fg:#1d2230)$line_break$nix_shell$character";
+        format = "[░▒▓](#b4befe)[  ](bg:#b4befe fg:#1e1e2e)[](bg:#89b4fa fg:#b4befe)$directory[](fg:#89b4fa bg:#45475a)$git_branch$git_status[](fg:#45475a bg:#313244)$nodejs$rust$golang$php[](fg:#313244 bg:#1e1e2e)$time[ ](fg:#1e1e2e)$line_break$nix_shell$character";
 
         character = {
           success_symbol = "[➜](bold green)";
@@ -25,20 +27,20 @@
         directory = {
           truncation_length = 3;
           truncation_symbol = "…/";
-          style = "fg:#e3e5e5 bg:#769ff0";
+          style = "fg:#cdd6f4 bg:#89b4fa";
           format = "[ $path ]($style)";
           read_only = " ";
         };
 
         git_branch = {
           symbol = " ";
-          style = "bg:#394260";
-          format = "[[ $symbol$branch ](fg:#769ff0 bg:#394260)]($style)";
+          style = "bg:#45475a";
+          format = "[[ $symbol$branch ](fg:#89b4fa bg:#45475a)]($style)";
         };
 
         git_status = {
-          style = "bg:#394260";
-          format = "[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)";
+          style = "bg:#45475a";
+          format = "[[($all_status$ahead_behind )](fg:#89b4fa bg:#45475a)]($style)";
         };
 
         nix_shell = {
@@ -48,33 +50,33 @@
 
         nodejs = {
           symbol = " ";
-          style = "bg:#212736";
-          format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
+          style = "bg:#313244";
+          format = "[[ $symbol($version) ](fg:#89b4fa bg:#313244)]($style)";
         };
 
         rust = {
           symbol = "󱘗 ";
-          style = "bg:#212736";
-          format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
+          style = "bg:#313244";
+          format = "[[ $symbol($version) ](fg:#89b4fa bg:#313244)]($style)";
         };
 
         golang = {
           symbol = " ";
-          style = "bg:#212736";
-          format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
+          style = "bg:#313244";
+          format = "[[ $symbol($version) ](fg:#89b4fa bg:#313244)]($style)";
         };
 
         php = {
           symbol = " ";
-          style = "bg:#212736";
-          format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
+          style = "bg:#313244";
+          format = "[[ $symbol($version) ](fg:#89b4fa bg:#313244)]($style)";
         };
 
         time = {
           disabled = false;
           time_format = "%R";
-          style = "bg:#1d2230";
-          format = "[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)";
+          style = "bg:#1e1e2e";
+          format = "[[  $time ](fg:#a6adc8 bg:#1e1e2e)]($style)";
         };
       };
     };
