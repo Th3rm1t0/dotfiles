@@ -1,6 +1,16 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
-  # dust は home-manager の programs.* 未対応のためパッケージとして導入する。
-  home.packages = [ pkgs.dust ];
+  options.dotfiles.programs.dust.enable = lib.mkEnableOption "dust" // {
+    default = true;
+  };
+
+  config = lib.mkIf config.dotfiles.programs.dust.enable {
+    home.packages = [ pkgs.dust ];
+  };
 }

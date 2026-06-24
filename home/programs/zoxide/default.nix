@@ -1,8 +1,18 @@
-{ ... }:
+{
+  config,
+  lib,
+  ...
+}:
 
 {
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
+  options.dotfiles.programs.zoxide.enable = lib.mkEnableOption "zoxide" // {
+    default = true;
+  };
+
+  config = lib.mkIf config.dotfiles.programs.zoxide.enable {
+    programs.zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
   };
 }

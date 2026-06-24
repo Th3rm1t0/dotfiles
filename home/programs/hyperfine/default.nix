@@ -1,6 +1,16 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
-  # hyperfine は home-manager の programs.* 未対応のためパッケージとして導入する。
-  home.packages = [ pkgs.hyperfine ];
+  options.dotfiles.programs.hyperfine.enable = lib.mkEnableOption "hyperfine" // {
+    default = true;
+  };
+
+  config = lib.mkIf config.dotfiles.programs.hyperfine.enable {
+    home.packages = [ pkgs.hyperfine ];
+  };
 }
