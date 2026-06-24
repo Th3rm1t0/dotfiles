@@ -1,7 +1,14 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
+    inputs.catppuccin.homeManagerModules.catppuccin
+    inputs.op-shell-plugins.hmModules.default
     ../home
   ];
 
