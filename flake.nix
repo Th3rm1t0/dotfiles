@@ -7,8 +7,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    claude-code.url = "github:sadjow/claude-code-nix"; # claude-code の最新版への追従のため
-    hermes-agent.url = "github:NousResearch/hermes-agent"; # Hermes Agent (Nous Research) の導入のため
+    claude-code = {
+      url = "github:sadjow/claude-code-nix"; # claude-code の最新版への追従のため
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent"; # Hermes Agent (Nous Research) の導入のため
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     agent-skills.url = "path:./inputs/skills";
   };
 
