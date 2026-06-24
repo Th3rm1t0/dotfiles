@@ -9,7 +9,7 @@ build:
     home-manager build --flake .#{{config}}
 
 switch:
-    home-manager switch -b backup --flake .#{{config}}
+    home-manager switch --flake .#{{config}}
 
 update:
     nix flake update
