@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }:
 
 {
-  nixpkgs.overlays = [ inputs.claude-code.overlays.default ]; # 最新の claude-code への追従のため
+  nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
 
   home.packages = with pkgs; [
     claude-code
