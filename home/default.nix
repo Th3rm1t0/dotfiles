@@ -1,33 +1,22 @@
 {
-  config,
+  lib,
   pkgs,
   inputs,
   ...
 }:
 
+let
+  programDirs = builtins.attrNames (
+    lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./programs)
+  );
+in
 {
   imports = [
     inputs.agent-skills.homeManagerModules.default
-    ./programs/claude-code
-    ./programs/hermes-agent
-    ./programs/fzf
-    ./programs/starship
-    ./programs/zsh
-    ./programs/direnv
-    ./programs/delta
-    ./programs/zoxide
-    ./programs/lazygit
-    ./programs/btop
-    ./programs/dust
-    ./programs/hyperfine
-    ./programs/gh
-    ./programs/1password
-    ./programs/tmux
-  ];
+  ] ++ map (name: ./programs/${name}) programDirs;
 
   programs.home-manager.enable = true;
 
-  # Nix
   nix = {
     package = pkgs.nix;
     settings = {
