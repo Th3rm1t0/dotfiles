@@ -16,9 +16,8 @@
 
       settings = {
         character = {
-          success_symbol = "[[ ](green) ❯](peach)";
-          error_symbol = "[[ ](red) ❯](peach)";
-          vimcmd_symbol = "[ ❮](subtext1)";
+          success_symbol = "[➜](bold green)";
+          error_symbol = "[➜](bold red)";
         };
 
         directory = {
