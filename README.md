@@ -10,30 +10,48 @@ Nix flakes と home-manager で管理する dotfiles リポジトリ。
 
 ## セットアップ
 
-リポジトリをクローンし、`setup.sh` を実行する。
+### 1. Nix をインストール
+
+[nix-installer](https://github.com/NixOS/nix-installer) を使う。
 
 ```sh
-git clone https://github.com/Kyure-A/dotfiles.git ~/dotfiles
+curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes
+```
+
+インストール後、シェルを再起動して `nix` コマンドが使えることを確認する。
+
+### 2. dotfiles を適用
+
+リモートから直接実行できる（リポジトリのクローンは不要）。
+
+```sh
+nix run github:Th3rm1t0/dotfiles
+```
+
+ホスト名から設定を自動検出する。明示的に指定する場合：
+
+```sh
+nix run github:Th3rm1t0/dotfiles -- th3rm1t3@ubuntu-wsl
+```
+
+初回の適用時に以下が自動で行われる：
+
+- zsh がデフォルトシェルに設定される（sudo を要求）
+- 1Password shell-plugins が有効化される（`op signin` は別途手動で実行）
+
+### 3. リポジトリをクローン（日常操作用）
+
+```sh
+git clone https://github.com/Th3rm1t0/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./setup.sh
+direnv allow
 ```
 
-`setup.sh` は以下を順に実行する。
-
-1. Nix が未インストールなら [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer) でインストールする
-2. `flake.nix` の `homeConfigurations` から設定名を検出し、`home-manager switch` で適用する
-3. 1Password CLI のサインインとプラグインの設定を行う
-4. zsh をデフォルトシェルに設定する
-
-`homeConfigurations` が複数ある場合は引数で設定名を指定する。
-
-```sh
-./setup.sh th3rm1t3@ubuntu-wsl
-```
+以降は `just switch` で設定を適用する。
 
 ## 開発環境
 
-devShell に nixfmt・deadnix・statix・just を含む。
+devShell に nixfmt・deadnix・statix・just・nh を含む。
 direnv が有効な環境ではリポジトリに `cd` するだけで自動ロードされる。
 
 ```sh
@@ -44,8 +62,8 @@ direnv allow   # 初回のみ
 
 | コマンド | 内容 |
 |----------|------|
-| `just build` | home-manager build |
-| `just switch` | home-manager switch |
+| `just build` | nh home build |
+| `just switch` | nh home switch |
 | `just update` | flake.lock を更新 |
 | `just gc` | Nix ストアのガベージコレクション |
 | `just check` | nix flake check |
@@ -122,5 +140,5 @@ home/programs/*、home/services/*
 
 - Nix flakes は Git にコミットまたはステージングされたファイルだけを参照してビルドする。
   新規ファイルは `git add` してからビルドすること。
-- `home-manager switch` の前に `home-manager build` で成功を確認するのを推奨する。
-- 問題発生時は `home-manager switch --rollback` で直前の世代に戻せる。
+- `just switch` の前に `just build` で成功を確認するのを推奨する。
+- 問題発生時は `home-manager generations` で世代を確認し、ロールバックできる。

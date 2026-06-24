@@ -6,10 +6,10 @@ default:
     @just --list
 
 build:
-    home-manager build --flake .#{{config}}
+    nh home build . -c {{config}}
 
 switch:
-    home-manager switch --flake .#{{config}}
+    nh home switch . -c {{config}}
 
 update:
     nix flake update

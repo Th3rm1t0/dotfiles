@@ -15,6 +15,7 @@
       };
       modules = [
         inputs.catppuccin.homeManagerModules.catppuccin
+        inputs.op-shell-plugins.hmModules.default
         ../hosts/${hostname}.nix
       ];
     };

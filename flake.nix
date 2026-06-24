@@ -19,6 +19,10 @@
       url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    op-shell-plugins = {
+      url = "github:1Password/shell-plugins";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     agent-skills.url = "path:./inputs/skills";
   };
 
@@ -64,6 +68,7 @@
               deadnix
               statix
               just
+              nh
             ];
           };
         }
@@ -94,6 +99,31 @@
           statix = pkgs.runCommand "check-statix" { nativeBuildInputs = [ pkgs.statix ]; } ''
             statix check --ignore [".claude/"] ${self} && touch $out
           '';
+        }
+      );
+
+      apps = forAllSystems (
+        system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          default = {
+            type = "app";
+            program =
+              let
+                bootstrap = pkgs.writeShellApplication {
+                  name = "dotfiles-bootstrap";
+                  runtimeInputs = [ inputs.home-manager.packages.${system}.default ];
+                  text = ''
+                    config="''${1:-th3rm1t3@$(hostname)}"
+                    echo "Applying: $config"
+                    home-manager switch --flake "${self}#$config"
+                  '';
+                };
+              in
+              "${bootstrap}/bin/dotfiles-bootstrap";
+          };
         }
       );
 

@@ -11,7 +11,9 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 - **Nix flakes**: 依存関係の固定と再現性の保証
 - **home-manager** (standalone): ユーザー環境の宣言的管理
 - **just**: タスクランナー
+- **nh**: home-manager switch/build の UX 改善ラッパー
 - **direnv + nix-direnv**: 開発環境の自動ロード
+- **1Password shell-plugins**: CLI ツール（gh 等）の認証を 1Password 経由で管理
 - **GitHub Actions**: CI（flake check、flake.lock 自動更新）
 
 ### 対象環境
@@ -153,8 +155,8 @@ pkgs: {
 
 | コマンド | 内容 |
 |----------|------|
-| `just build` | ビルドのみ（適用しない） |
-| `just switch` | ビルドして適用 |
+| `just build` | ビルドのみ（適用しない、nh 経由） |
+| `just switch` | ビルドして適用（nh 経由） |
 | `just update` | flake.lock を更新 |
 | `just gc` | Nix ストアのガベージコレクション |
 | `just check` | nix flake check |
