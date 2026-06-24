@@ -13,6 +13,7 @@
     ./programs/fzf
     ./programs/starship
     ./programs/zsh
+    ./programs/direnv
     ./programs/delta
     ./programs/zoxide
     ./programs/lazygit
