@@ -15,7 +15,7 @@
   config = lib.mkIf config.dotfiles.programs.op-shell-plugins.enable {
     programs._1password-shell-plugins = {
       enable = true;
-      plugins = with pkgs; [ gh ];
+      plugins = [ ];
     };
   };
 }
