@@ -11,7 +11,7 @@
 
   config = lib.mkIf config.dotfiles.programs.zsh.enable {
     home.activation.setDefaultShell = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      currentShell=$(getent passwd "$USER" | cut -d: -f7)
+      currentShell=$(grep "^$USER:" /etc/passwd | cut -d: -f7)
       zshPath=$(command -v zsh)
       if [ "$currentShell" != "$zshPath" ] && [ -n "$zshPath" ]; then
         if ! grep -qxF "$zshPath" /etc/shells 2>/dev/null; then
