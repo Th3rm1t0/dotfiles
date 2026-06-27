@@ -7,7 +7,7 @@
 
 {
   imports = [
-    inputs.catppuccin.homeManagerModules.catppuccin
+    inputs.catppuccin.homeModules.catppuccin
     inputs.op-shell-plugins.hmModules.default
     ../home
   ];
