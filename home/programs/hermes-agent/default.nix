@@ -13,7 +13,7 @@
 
   config = lib.mkIf config.dotfiles.programs.hermes-agent.enable {
     home.packages = [
-      inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.full
+      inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
   };
 }
