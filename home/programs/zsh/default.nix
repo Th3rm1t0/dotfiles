@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -13,15 +12,15 @@
   config = lib.mkIf config.dotfiles.programs.zsh.enable {
     home.activation.setDefaultShell =
       let
-        zshPath = "${pkgs.zsh}/bin/zsh";
+        zshPath = "$HOME/.nix-profile/bin/zsh";
       in
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         currentShell=$(grep "^$USER:" /etc/passwd | cut -d: -f7)
         if [ "$currentShell" != "${zshPath}" ]; then
           if ! grep -qxF "${zshPath}" /etc/shells 2>/dev/null; then
-            echo "${zshPath}" | sudo tee -a /etc/shells >/dev/null
+            echo "${zshPath}" | /usr/bin/sudo tee -a /etc/shells >/dev/null
           fi
-          sudo chsh -s "${zshPath}" "$USER"
+          /usr/bin/sudo chsh -s "${zshPath}" "$USER"
         fi
       '';
 
