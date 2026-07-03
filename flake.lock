@@ -135,6 +135,26 @@
         "type": "github"
       }
     },
+    "herdr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783040565,
+        "narHash": "sha256-RRXcYn3mpQ8EqDoS/uLnnFBXz4t80h4eBj1C1GgbqYA=",
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "rev": "ef67a97047c92e4af6b9d69c7292962426109bc1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "type": "github"
+      }
+    },
     "hermes-agent": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -401,6 +421,7 @@
         "agent-skills": "agent-skills",
         "catppuccin": "catppuccin",
         "claude-code": "claude-code",
+        "herdr": "herdr",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager_2",
         "nixpkgs": "nixpkgs_2",
