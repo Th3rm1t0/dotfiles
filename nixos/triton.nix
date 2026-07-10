@@ -3,6 +3,7 @@
   wsl = {
     enable = true;
     defaultUser = "th3rm1t3";
+    interop.register = true;
   };
 
   networking.hostName = "triton";
