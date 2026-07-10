@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -135,5 +139,8 @@
         "th3rm1t3@ubuntu-wsl" = lib.mkHome { hostname = "ubuntu-wsl"; };
       };
 
+      nixosConfigurations = {
+        triton = lib.mkNixos { hostname = "triton"; };
+      };
     };
 }

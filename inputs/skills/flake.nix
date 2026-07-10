@@ -43,7 +43,7 @@
     }:
     {
       homeManagerModules.default =
-        { ... }@args:
+        args:
         import ./default.nix (
           args
           // {

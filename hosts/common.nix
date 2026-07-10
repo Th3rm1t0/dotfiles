@@ -21,8 +21,6 @@
     accent = "blue";
   };
 
-  targets.genericLinux.enable = true;
-
   # XDG Base Directory
   xdg = {
     enable = true;

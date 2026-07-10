@@ -17,15 +17,4 @@ in
   ++ map (name: ./programs/${name}) programDirs;
 
   programs.home-manager.enable = true;
-
-  nix = {
-    package = pkgs.nix;
-    settings = {
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      warn-dirty = true;
-    };
-  };
 }

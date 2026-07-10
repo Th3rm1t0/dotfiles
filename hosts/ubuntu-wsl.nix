@@ -3,6 +3,7 @@
 {
   imports = [
     ./common.nix
+    ./roles/wsl.nix
   ];
 
   home = {
@@ -12,14 +13,16 @@
 
   programs.wezterm.enable = false;
 
-  home.sessionVariables = {
-    # wslview は Ubuntu WSL に標準で入っている wslu (apt) から利用できる。
-    # nixpkgs の wslu はプロジェクト終了により削除されたため、ここでは導入しない。
-    BROWSER = "wslview";
-  };
+  targets.genericLinux.enable = true;
 
-  programs.git.settings.core = {
-    autocrlf = "input";
-    sshCommand = "ssh.exe";
+  nix = {
+    package = pkgs.nix;
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      warn-dirty = true;
+    };
   };
 }
