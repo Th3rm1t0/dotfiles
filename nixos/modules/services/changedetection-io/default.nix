@@ -10,7 +10,7 @@ in
     services.changedetection-io = {
       enable = true;
       listenAddress = lib.mkDefault "127.0.0.1";
-      port = lib.mkDefault 5000;
+      port = lib.mkDefault 49160;
       webDriverSupport = false;
       playwrightSupport = false;
     };
