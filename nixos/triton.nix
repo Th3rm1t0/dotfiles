@@ -4,9 +4,8 @@
     enable = true;
     defaultUser = "th3rm1t3";
     interop.register = true;
+    wslConf.network.hostname = "triton";
   };
-
-  networking.hostName = "triton";
 
   nix.settings.experimental-features = [
     "nix-command"
