@@ -32,6 +32,7 @@
       };
       modules = [
         inputs.nixos-wsl.nixosModules.default
+        ../nixos/modules
         ../nixos/${hostname}.nix
         inputs.home-manager.nixosModules.home-manager
         {

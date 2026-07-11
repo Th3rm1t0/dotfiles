@@ -23,5 +23,9 @@
 
   virtualisation.docker.enable = true;
 
+  dotfiles.services = {
+    changedetection-io.enable = true;
+  };
+
   system.stateVersion = "25.05";
 }
