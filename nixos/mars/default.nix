@@ -18,6 +18,11 @@
   };
 
   boot = {
+    initrd = {
+    systemd.enable = true;
+    luks.devices."cryptroot".device =
+      "/dev/disk/by-uuid/fee75e3c-4387-4708-a6b3-821dcaaa1955";
+    };
     loader = {
       systemd-boot = {
         enable = true;
@@ -25,7 +30,6 @@
       };
       efi.canTouchEfiVariables = true;
     };
-    initrd.systemd.enable = true;
     # TODO: swap LV の UUID を後から記入
     # resumeDevice = "/dev/disk/by-uuid/<swap-lv-uuid>";
   };
