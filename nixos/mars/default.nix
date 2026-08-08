@@ -1,0 +1,62 @@
+{ inputs, lib, pkgs, ... }:
+{
+  imports = [
+    ./hardware-configuration.nix
+    inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
+  ];
+
+  # lenovo-thinkpad-l14-amd は trackpoint のホイールエミュレーション、
+  # acpi_backlight=native、fstrim を含む唯一の公式 L14 AMD モジュール
+  # (Gen1〜Gen4 で世代分岐なし)。ただし付属の iommu=soft は 2021年の
+  # Gen1 BIOS バグ対策で、Thunderbolt 経由の DMA 攻撃保護も無効化する
+  # ため明示的に外す。acpi_backlight=native は残す。
+  boot.kernelParams = lib.mkForce [ "acpi_backlight=native" ];
+
+  networking = {
+    hostName = "mars";
+    networkmanager.enable = true;
+  };
+
+  boot = {
+    loader = {
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 10;   # ESP 1GiB
+      };
+      efi.canTouchEfiVariables = true;
+    };
+    initrd.systemd.enable = true;
+    # TODO: swap LV の UUID を後から記入
+    # resumeDevice = "/dev/disk/by-uuid/<swap-lv-uuid>";
+  };
+
+  # TODO: us に切り替えたら変える
+  console.keyMap = "jp106";
+
+  time.timeZone = "Asia/Tokyo";
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  users.users.th3rm1t3 = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" "video" "docker" ];
+    shell = pkgs.zsh;
+  };
+  programs.zsh.enable = true;
+
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "th3rm1t3" ];
+  };
+
+  virtualisation.docker.enable = true;
+  services.fwupd.enable = true;
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+  };
+
+  system.stateVersion = "26.05";
+}

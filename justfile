@@ -1,4 +1,4 @@
-host := env("DOTFILES_HOST", "ubuntu-wsl")
+host := env("DOTFILES_HOST", "hostname")
 username := env("DOTFILES_USER", "th3rm1t3")
 config := username + "@" + host
 
@@ -10,6 +10,12 @@ build:
 
 switch:
     nh home switch . -c {{config}}
+
+os-build:
+    nh os build . -H {{host}}
+
+os-switch:
+    nh os switch . -H {{host}}
 
 update:
     nix flake update

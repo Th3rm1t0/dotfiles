@@ -23,6 +23,7 @@
       hostname,
       system ? "x86_64-linux",
       username ? "th3rm1t3",
+      extraModules ? [],
     }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
@@ -31,9 +32,8 @@
         inherit (inputs) self;
       };
       modules = [
-        inputs.nixos-wsl.nixosModules.default
         ../nixos/modules
-        ../nixos/${hostname}.nix
+        ../nixos/${hostname}
         inputs.home-manager.nixosModules.home-manager
         {
           nixpkgs.config.allowUnfree = true;
@@ -48,6 +48,6 @@
             users.${username} = import ../hosts/${hostname}.nix;
           };
         }
-      ];
+      ] ++ extraModules;
     };
 }
