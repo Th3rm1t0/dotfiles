@@ -30,8 +30,7 @@
       };
       efi.canTouchEfiVariables = true;
     };
-    # TODO: swap LV の UUID を後から記入
-    # resumeDevice = "/dev/disk/by-uuid/<swap-lv-uuid>";
+    resumeDevice = "/dev/disk/by-uuid/4c49cf25-8185-489e-8d72-485d8bec4d76";
   };
 
   # TODO: us に切り替えたら変える
