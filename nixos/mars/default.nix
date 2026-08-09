@@ -43,6 +43,7 @@
   };
 
   security.tpm2.enable = true;
+  security.polkit.enable = true;
 
   environment.systemPackages = [ pkgs.sbctl pkgs.tpm2-tools ];
 
