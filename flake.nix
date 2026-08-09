@@ -15,6 +15,14 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      # inputs.nixpkgs.follows はあえて設定しない。
+      # lanzaboote は自前で固定した nixpkgs/Rust ツールチェーンでビルドされており、
+      # ここを unstable に追従させると、手元の nixpkgs が進んだ時点で
+      # Rust/cargo のビルドが壊れる不具合が過去に報告されている。
+      # 追従させない分システムクロージャは多少大きくなるが、安定性を優先する。
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
