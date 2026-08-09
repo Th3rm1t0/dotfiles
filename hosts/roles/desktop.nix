@@ -2,8 +2,6 @@
 {
   programs.foot.enable = true;
 
-  services.hyprpolkitagent.enable = true;
-
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -16,6 +14,9 @@
       input = {
         kb_layout = "jp";
       };
+      exec-once = [
+        "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
+      ];
     };
   };
 }
