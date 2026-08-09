@@ -64,6 +64,17 @@
     polkitPolicyOwners = [ "th3rm1t3" ];
   };
 
+  programs.hyprland.enable = true;
+
+  # ログイン
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+      user = "greeter";
+    };
+  };
+
   virtualisation.docker.enable = true;
   services.fwupd.enable = true;
   services.pipewire = {
