@@ -3,6 +3,7 @@
   imports = [
     ./common.nix
     ./roles/laptop.nix
+    ./roles/desktop.nix
   ];
 
   home = {

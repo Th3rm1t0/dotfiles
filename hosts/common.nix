@@ -15,7 +15,7 @@
   home.stateVersion = "24.05";
 
   catppuccin = {
-    enable = true;
+    enable = false;
     autoEnable = true;
     flavor = "mocha";
     accent = "blue";
