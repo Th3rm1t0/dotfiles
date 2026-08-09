@@ -43,6 +43,10 @@
   };
 
   security.tpm2.enable = true;
+  security.polkit = {
+    enable = true;
+    enablePkexecWrapper = true;
+  };
 
   environment.systemPackages = [ pkgs.sbctl pkgs.tpm2-tools ];
 
