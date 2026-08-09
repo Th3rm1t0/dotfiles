@@ -1,7 +1,8 @@
 { pkgs, ... }:
 {
-  programs.foot.enable = true;
+  fonts.fontconfig.enable = true;
 
+  programs.foot.enable = true;
   programs.rofi.enable = true;
 
   programs.waybar = {
@@ -9,7 +10,7 @@
     settings.mainBar = {
       layer = "top";
       position = "top";
-      height = 32;
+      height = 34;
       modules-left = [ "hyprland/workspaces" ];
       modules-center = [ "clock" ];
       modules-right = [ "pulseaudio" "network" "battery" "tray" ];
