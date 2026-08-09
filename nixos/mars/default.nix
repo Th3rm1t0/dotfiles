@@ -20,8 +20,9 @@
   boot = {
     initrd = {
     systemd.enable = true;
-    luks.devices."cryptroot".device =
-      "/dev/disk/by-uuid/fee75e3c-4387-4708-a6b3-821dcaaa1955";
+    luks.devices."cryptroot" = { 
+        device = "/dev/disk/by-uuid/fee75e3c-4387-4708-a6b3-821dcaaa1955";
+        allowDiscards = true;
     };
     loader = {
       systemd-boot = {
