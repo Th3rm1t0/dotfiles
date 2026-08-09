@@ -1,7 +1,9 @@
 { pkgs, ... }:
 {
   programs.foot.enable = true;
-  
+
+  services.hyprpolkitagent.enable = true;
+
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
