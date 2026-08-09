@@ -24,6 +24,7 @@
       luks.devices."cryptroot" = {
         device = "/dev/disk/by-uuid/fee75e3c-4387-4708-a6b3-821dcaaa1955";
         allowDiscards = true;
+        crypttabExtraOpts = [ "tpm2-device=auto" ];
       };
     };
     resumeDevice = "/dev/disk/by-uuid/4c49cf25-8185-489e-8d72-485d8bec4d76";
@@ -41,7 +42,9 @@
     };
   };
 
-  environment.systemPackages = [ pkgs.sbctl ];
+  security.tpm2.enable = true;
+
+  environment.systemPackages = [ pkgs.sbctl pkgs.tpm2-tools ];
 
   # TODO: us に切り替えたら変える
   console.keyMap = "jp106";
