@@ -41,7 +41,9 @@
     };
   };
 
-  environment.systemPackages = [ pkgs.sbctl ];
+  security.tpm2.enable = true;
+
+  environment.systemPackages = [ pkgs.sbctl pkgs.tpm2-tools ];
 
   # TODO: us に切り替えたら変える
   console.keyMap = "jp106";
