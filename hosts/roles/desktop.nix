@@ -2,10 +2,7 @@
 {
   programs.foot.enable = true;
 
-  programs.rofi = {
-    enable = true;
-    package = pkgs.rofi-wayland;
-  };
+  programs.rofi.enable = true;
 
   programs.waybar = {
     enable = true;
