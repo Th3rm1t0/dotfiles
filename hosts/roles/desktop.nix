@@ -13,6 +13,9 @@
         "$mod, Q, killactive"
         "$mod SHIFT, E, exit"
       ];
+      input = {
+        kb_layout = "jp";
+      };
     };
   };
 }
