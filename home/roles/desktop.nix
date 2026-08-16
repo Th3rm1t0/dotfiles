@@ -6,6 +6,7 @@ _: {
     rofi.enable = true;
     waybar.enable = true;
     hyprland.enable = true;
+    zen-browser.enable = true;
   };
 
   # Hyprland 0.55 で設定形式が hyprlang から Lua へ移行中で、Stylix / home-manager の
