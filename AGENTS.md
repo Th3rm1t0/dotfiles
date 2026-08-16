@@ -113,6 +113,8 @@ some-flake = {
 dotfiles.programs.lazygit.enable = false;
 ```
 
+GUI・デスクトップ環境向けモジュール（foot / rofi / waybar / hyprland 等）は `default = false` とし、`home/roles/desktop.nix` から有効化する。`home/default.nix` の自動探索により `programs/` 配下は全ホストへ無条件に import されるため、WSL 環境への混入を防ぐ必要がある。
+
 ### モジュールのテンプレート
 
 ```nix
