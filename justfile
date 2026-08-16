@@ -27,13 +27,13 @@ check:
     nix flake check
 
 fmt:
-    nix fmt
+    nix fmt $(git ls-files -- '*.nix')
 
 lint:
     deadnix --exclude .claude .
-    statix check --ignore [".claude/"]
+    statix check --ignore .claude/ .
 
 fix:
     deadnix -e --exclude .claude .
-    statix fix --ignore [".claude/"]
-    nix fmt
+    statix fix --ignore .claude/ .
+    nix fmt $(git ls-files -- '*.nix')

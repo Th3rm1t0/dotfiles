@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   wsl = {
     enable = true;
     defaultUser = "th3rm1t3";
