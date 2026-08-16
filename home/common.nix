@@ -8,7 +8,7 @@
 {
   imports = [
     inputs.op-shell-plugins.hmModules.default
-    ../home
+    ./default.nix
   ];
 
   home.stateVersion = "24.05";

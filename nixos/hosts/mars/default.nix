@@ -7,8 +7,8 @@
   imports = [
     ./hardware-configuration.nix
     inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-    ../roles/secure-boot.nix
-    ../roles/desktop.nix
+    ../../roles/secure-boot.nix
+    ../../roles/desktop.nix
   ];
 
   networking = {

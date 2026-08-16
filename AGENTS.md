@@ -31,20 +31,22 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 ├── flake.lock          # 依存関係のロックファイル（自動生成）
 ├── justfile            # タスクランナーのレシピ定義
 ├── .envrc              # direnv 設定（use flake）
-├── hosts/              # home-manager 側のホスト固有設定
+├── home/               # home-manager 層
 │   ├── common.nix      # 全ホスト共通設定
-│   ├── roles/          # ホストの用途ごとに共通する設定（wsl / desktop / laptop）
-│   └── <hostname>.nix  # 各ホストの設定（common.nix + roles/ を組み合わせる）
-├── home/               # home-manager 側のユーザー環境設定の本体
 │   ├── default.nix     # エントリポイント（programs/ を自動探索）
+│   ├── roles/          # ホストの用途ごとに共通する設定（wsl / desktop / bare-metal）
+│   ├── hosts/
+│   │   └── <hostname>.nix  # 各ホストの設定（common.nix + roles/ を組み合わせる）
 │   ├── programs/       # アプリケーション設定（1 アプリ 1 ディレクトリ）
 │   └── claude/         # Claude の Agent Skill 管理（agent-skills-nix）
-├── nixos/              # NixOS 側のホスト固有設定
-│   ├── <hostname>/     # 各ホストの設定（hardware-configuration.nix 等を含む）
-│   │   └── default.nix
-│   └── modules/        # NixOS 側のユーザー環境設定の本体
-│       ├── default.nix # エントリポイント（services/ を自動探索）
-│       └── services/   # サービス設定（1 サービス 1 ディレクトリ）
+├── nixos/              # NixOS 層
+│   ├── common.nix      # 全ホスト共通設定
+│   ├── default.nix     # エントリポイント（services/ を自動探索）
+│   ├── roles/          # ホストの用途ごとに共通する設定（secure-boot / desktop）
+│   ├── hosts/
+│   │   └── <hostname>/     # 各ホストの設定（hardware-configuration.nix 等を含む）
+│   │       └── default.nix
+│   └── services/       # サービス設定（1 サービス 1 ディレクトリ）
 ├── lib/                # ヘルパー関数（mkHome / mkNixos 等）
 │   └── default.nix
 ├── overlays/           # nixpkgs のオーバーレイ（外部 flake の overlay 集約）
@@ -63,7 +65,7 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 このリポジトリは独立した 2 つの層で構成される。
 
 - **NixOS 層**（`nixos/`）: システム全体で 1 つに定まる設定。ブートローダ、カーネル、ネットワーク、マルチユーザーで共有するサービスなど。
-- **home-manager 層**（`hosts/` / `home/`）: ユーザーごとの設定。シェル、CLI ツール、ユーザーセッションで動くアプリケーションなど。
+- **home-manager 層**（`home/`）: ユーザーごとの設定。シェル、CLI ツール、ユーザーセッションで動くアプリケーションなど。
 
 設定をどちらに書くかは「システム全体で 1 つに定まるか」で判断する。迷ったら「複数ユーザーがいたら共有すべき設定か」を基準に考えるとよい。
 
@@ -107,7 +109,7 @@ some-flake = {
 各プログラムモジュールは `dotfiles.programs.<name>.enable` オプションを持つ。デフォルトは `true`。ホスト設定から無効化できる：
 
 ```nix
-# hosts/<hostname>.nix で特定プログラムを無効化
+# home/hosts/<hostname>.nix で特定プログラムを無効化
 dotfiles.programs.lazygit.enable = false;
 ```
 
@@ -147,7 +149,7 @@ dotfiles.programs.lazygit.enable = false;
 home 層の `dotfiles.programs.<name>.enable` と対になる規約として、NixOS のサービスモジュールは `dotfiles.services.<name>.enable` オプションを持つ。home 層のプログラムはデフォルト有効（`default = true`）だが、NixOS のサービスはホストごとに必要なものだけ立てるためデフォルト無効（`mkEnableOption` の既定値のまま）とし、各ホストの `nixos/<hostname>/default.nix` から明示的に有効化する。
 
 ```nix
-# nixos/modules/services/<name>/default.nix
+# nixos/services/<name>/default.nix
 { config, lib, ... }:
 
 let
@@ -162,7 +164,7 @@ in
 }
 ```
 
-`nixos/modules/default.nix` が `services/` 配下のディレクトリを `builtins.readDir` で自動探索する。新しいサービスは `nixos/modules/services/<name>/default.nix` を作成して `git add` するだけで認識される。
+`nixos/default.nix` が `services/` 配下のディレクトリを `builtins.readDir` で自動探索する。新しいサービスは `nixos/services/<name>/default.nix` を作成して `git add` するだけで認識される。
 
 ## overlay とカスタムパッケージ
 
@@ -220,7 +222,7 @@ pkgs: {
 
 ### 新しい home-manager ホストを追加する場合
 
-1. `hosts/<hostname>.nix` を作成し、`common.nix` をインポート
+1. `home/hosts/<hostname>.nix` を作成し、`../common.nix` をインポート
 2. `flake.nix` の `homeConfigurations` に `lib.mkHome` で 1 行追加：
 ```nix
 "<user>@<hostname>" = lib.mkHome { hostname = "<hostname>"; };
@@ -230,13 +232,13 @@ pkgs: {
 
 ### 新しい NixOS ホストを追加する場合
 
-1. `nixos/<hostname>/default.nix` を作成（`hardware-configuration.nix` の import を含める）
+1. `nixos/hosts/<hostname>/default.nix` を作成（`hardware-configuration.nix` の import を含める）
 2. `flake.nix` の `nixosConfigurations` に `lib.mkNixos` で 1 行追加：
 ```nix
 "<hostname>" = lib.mkNixos { hostname = "<hostname>"; };
 ```
    NixOS-WSL の場合は `extraModules = [ inputs.nixos-wsl.nixosModules.default ];` を追加する。
-3. `mkNixos` は home-manager モジュールを内蔵しており、`hosts/<hostname>.nix` を `users.${username}` に自動で割り当てる。ユーザー環境の設定はここに用意する
+3. `mkNixos` は home-manager モジュールを内蔵しており、`home/hosts/<hostname>.nix` を `users.${username}` に自動で割り当てる。ユーザー環境の設定はここに用意する
 4. `git add` してビルド確認：`nixos-rebuild build --flake .#<hostname>`
 
 ## よくある問題と解決策

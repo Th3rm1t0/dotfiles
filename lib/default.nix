@@ -13,7 +13,7 @@
         inherit (inputs) self;
       };
       modules = [
-        ../hosts/${hostname}.nix
+        ../home/hosts/${hostname}.nix
       ];
     };
 
@@ -32,8 +32,8 @@
       };
       modules = [
         ../nixos/common.nix
-        ../nixos/modules
-        ../nixos/${hostname}
+        ../nixos
+        ../nixos/hosts/${hostname}
         inputs.home-manager.nixosModules.home-manager
         {
           nixpkgs.config.allowUnfree = true;
@@ -45,7 +45,7 @@
               inherit inputs;
               inherit (inputs) self;
             };
-            users.${username} = import ../hosts/${hostname}.nix;
+            users.${username} = import ../home/hosts/${hostname}.nix;
           };
         }
       ]

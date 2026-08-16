@@ -1,9 +1,8 @@
 { ... }:
 {
   imports = [
-    ./common.nix
-    ./roles/laptop.nix
-    ./roles/desktop.nix
+    ../common.nix
+    ../roles/wsl.nix
   ];
 
   home = {

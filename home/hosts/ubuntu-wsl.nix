@@ -2,8 +2,8 @@
 
 {
   imports = [
-    ./common.nix
-    ./roles/wsl.nix
+    ../common.nix
+    ../roles/wsl.nix
   ];
 
   home = {
