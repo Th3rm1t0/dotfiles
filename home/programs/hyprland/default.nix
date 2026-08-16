@@ -21,6 +21,7 @@
           "$mod SHIFT, E, exit"
           "$mod, V, togglefloating"
           "$mod, D, exec, rofi -show drun"
+          "$mod SHIFT, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
         ];
         bindm = [
           "$mod, mouse:272, movewindow"
@@ -29,6 +30,7 @@
         exec-once = [
           "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
           "waybar"
+          "wl-paste --watch cliphist store"
         ];
       };
     };
