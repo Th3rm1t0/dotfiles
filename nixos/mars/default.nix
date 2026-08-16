@@ -12,19 +12,19 @@
     inputs.stylix.nixosModules.stylix
   ];
 
-  # lenovo-thinkpad-l14-amd は trackpoint のホイールエミュレーション、
-  # acpi_backlight=native、fstrim を含む唯一の公式 L14 AMD モジュール
-  # (Gen1〜Gen4 で世代分岐なし)。ただし付属の iommu=soft は 2021年の
-  # Gen1 BIOS バグ対策で、Thunderbolt 経由の DMA 攻撃保護も無効化する
-  # ため明示的に外す。acpi_backlight=native は残す。
-  boot.kernelParams = lib.mkForce [ "acpi_backlight=native" ];
-
   networking = {
     hostName = "mars";
     networkmanager.enable = true;
   };
 
   boot = {
+    # lenovo-thinkpad-l14-amd は trackpoint のホイールエミュレーション、
+    # acpi_backlight=native、fstrim を含む唯一の公式 L14 AMD モジュール
+    # (Gen1〜Gen4 で世代分岐なし)。ただし付属の iommu=soft は 2021年の
+    # Gen1 BIOS バグ対策で、Thunderbolt 経由の DMA 攻撃保護も無効化する
+    # ため明示的に外す。acpi_backlight=native は残す。
+    kernelParams = lib.mkForce [ "acpi_backlight=native" ];
+
     initrd = {
       systemd.enable = true;
       luks.devices."cryptroot" = {
@@ -38,6 +38,10 @@
     lanzaboote = {
       enable = true;
       pkiBundle = "/var/lib/sbctl";
+      # systemd-boot が mkForce false されており、configurationLimit の
+      # 継承元が暗黙的になっているため明示する。ESP が 1GiB しかなく
+      # 世代が溢れると実害が出る。
+      configurationLimit = 10;
     };
     loader = {
       systemd-boot = {

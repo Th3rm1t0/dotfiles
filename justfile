@@ -1,4 +1,4 @@
-host := env("DOTFILES_HOST", "hostname")
+host := env("DOTFILES_HOST", `hostname`)
 username := env("DOTFILES_USER", "th3rm1t3")
 config := username + "@" + host
 
