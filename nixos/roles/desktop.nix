@@ -1,8 +1,26 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
+let
+  # nwg-hello 自体は greetd の子プロセスとして直接動くのではなく、Wayland
+  # コンポジタ上で動く GUI アプリのため、専用の最小構成 Hyprland を greeter
+  # セッションとして起動する。exec-once はシェル経由で実行され、greetd の
+  # systemd ユニットが持つ PATH には /run/current-system/sw/bin が含まれない
+  # ため、バイナリは絶対パスで指定する。
+  greeterHyprConf = pkgs.writeText "nwg-hello-hyprland.conf" ''
+    monitor=,preferred,auto,1
+    misc {
+        disable_hyprland_logo = true
+    }
+    animations {
+        enabled = false
+    }
+    exec-once = ${lib.getExe pkgs.nwg-hello}; ${pkgs.hyprland}/bin/hyprctl dispatch exit
+  '';
+in
 {
   imports = [
     inputs.stylix.nixosModules.stylix
@@ -20,7 +38,7 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd start-hyprland";
+      command = "${lib.getExe pkgs.hyprland} --config ${greeterHyprConf}";
       user = "greeter";
     };
   };
