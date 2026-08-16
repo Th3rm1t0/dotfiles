@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
     inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
     inputs.lanzaboote.nixosModules.lanzaboote
+    inputs.stylix.nixosModules.stylix
   ];
 
   # lenovo-thinkpad-l14-amd は trackpoint のホイールエミュレーション、
@@ -87,6 +88,16 @@
   services.pipewire = {
     enable = true;
     pulse.enable = true;
+  };
+
+  stylix = {
+    enable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+    polarity = "dark";
+    fonts.monospace = {
+      package = pkgs.nerd-fonts.jetbrains-mono;
+      name = "JetBrainsMono Nerd Font";
+    };
   };
 
   system.stateVersion = "26.05";
