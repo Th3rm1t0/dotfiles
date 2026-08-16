@@ -31,6 +31,7 @@
         inherit (inputs) self;
       };
       modules = [
+        ../nixos/common.nix
         ../nixos/modules
         ../nixos/${hostname}
         inputs.home-manager.nixosModules.home-manager

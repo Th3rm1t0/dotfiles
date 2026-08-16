@@ -66,25 +66,14 @@
   # TODO: us に切り替えたら変える
   console.keyMap = "jp106";
 
-  time.timeZone = "Asia/Tokyo";
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
   users.users.th3rm1t3 = {
     isNormalUser = true;
     extraGroups = [
       "wheel"
       "networkmanager"
       "video"
-      "docker"
     ];
-    shell = pkgs.zsh;
   };
-  programs.zsh.enable = true;
 
   programs._1password.enable = true;
   programs._1password-gui = {
@@ -103,7 +92,6 @@
     };
   };
 
-  virtualisation.docker.enable = true;
   services.fwupd.enable = true;
   services.pipewire = {
     enable = true;

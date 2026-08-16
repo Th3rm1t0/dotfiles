@@ -1,10 +1,12 @@
 { lib, ... }:
 
 let
-  serviceDirs = builtins.attrNames (
-    lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./services)
-  );
+  discoverModuleDirs =
+    dir:
+    map (name: dir + "/${name}") (
+      builtins.attrNames (lib.filterAttrs (_: type: type == "directory") (builtins.readDir dir))
+    );
 in
 {
-  imports = map (name: ./services/${name}) serviceDirs;
+  imports = discoverModuleDirs ./services;
 }
