@@ -1,15 +1,14 @@
 {
   inputs,
   lib,
-  pkgs,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
     inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-    inputs.lanzaboote.nixosModules.lanzaboote
-    inputs.stylix.nixosModules.stylix
+    ../roles/secure-boot.nix
+    ../roles/desktop.nix
   ];
 
   networking = {
@@ -34,34 +33,7 @@
       };
     };
     resumeDevice = "/dev/disk/by-uuid/4c49cf25-8185-489e-8d72-485d8bec4d76";
-    # lanzaboote は systemd-boot モジュールを置き換える
-    lanzaboote = {
-      enable = true;
-      pkiBundle = "/var/lib/sbctl";
-      # systemd-boot が mkForce false されており、configurationLimit の
-      # 継承元が暗黙的になっているため明示する。ESP が 1GiB しかなく
-      # 世代が溢れると実害が出る。
-      configurationLimit = 10;
-    };
-    loader = {
-      systemd-boot = {
-        enable = lib.mkForce false;
-        configurationLimit = 10; # ESP 1GiB
-      };
-      efi.canTouchEfiVariables = true;
-    };
   };
-
-  security.tpm2.enable = true;
-  security.polkit = {
-    enable = true;
-    enablePkexecWrapper = true;
-  };
-
-  environment.systemPackages = [
-    pkgs.sbctl
-    pkgs.tpm2-tools
-  ];
 
   # TODO: us に切り替えたら変える
   console.keyMap = "jp106";
@@ -73,39 +45,6 @@
       "networkmanager"
       "video"
     ];
-  };
-
-  programs._1password.enable = true;
-  programs._1password-gui = {
-    enable = true;
-    polkitPolicyOwners = [ "th3rm1t3" ];
-  };
-
-  programs.hyprland.enable = true;
-
-  # ログイン
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd start-hyprland";
-      user = "greeter";
-    };
-  };
-
-  services.fwupd.enable = true;
-  services.pipewire = {
-    enable = true;
-    pulse.enable = true;
-  };
-
-  stylix = {
-    enable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    polarity = "dark";
-    fonts.monospace = {
-      package = pkgs.nerd-fonts.jetbrains-mono;
-      name = "JetBrainsMono Nerd Font";
-    };
   };
 
   system.stateVersion = "26.05";

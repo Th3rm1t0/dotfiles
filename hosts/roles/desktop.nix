@@ -43,4 +43,10 @@
       ];
     };
   };
+
+  # Hyprland 0.55 で設定形式が hyprlang から Lua へ移行中で、Stylix / home-manager の
+  # 対応が追従途上のため、Hyprland の配色のみ Stylix の自動適用対象から外し、
+  # home-manager 側で config.lib.stylix.colors を手動参照する。移行が安定したら
+  # 元に戻す一時対応。
+  stylix.targets.hyprland.enable = false;
 }
