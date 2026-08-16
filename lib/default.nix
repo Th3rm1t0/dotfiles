@@ -23,7 +23,7 @@
       hostname,
       system ? "x86_64-linux",
       username ? "th3rm1t3",
-      extraModules ? [],
+      extraModules ? [ ],
     }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
@@ -48,6 +48,7 @@
             users.${username} = import ../hosts/${hostname}.nix;
           };
         }
-      ] ++ extraModules;
+      ]
+      ++ extraModules;
     };
 }

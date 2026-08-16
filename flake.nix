@@ -160,12 +160,12 @@
       };
 
       nixosConfigurations = {
-        triton = lib.mkNixos { 
+        triton = lib.mkNixos {
           hostname = "triton";
           extraModules = [ inputs.nixos-wsl.nixosModules.default ];
         };
-        mars = lib.mkNixos { 
-           hostname = "mars";
+        mars = lib.mkNixos {
+          hostname = "mars";
         };
       };
     };

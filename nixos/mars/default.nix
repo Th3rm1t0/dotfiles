@@ -1,4 +1,9 @@
-{ inputs, lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -37,7 +42,7 @@
     loader = {
       systemd-boot = {
         enable = lib.mkForce false;
-        configurationLimit = 10;   # ESP 1GiB
+        configurationLimit = 10; # ESP 1GiB
       };
       efi.canTouchEfiVariables = true;
     };
@@ -49,7 +54,10 @@
     enablePkexecWrapper = true;
   };
 
-  environment.systemPackages = [ pkgs.sbctl pkgs.tpm2-tools ];
+  environment.systemPackages = [
+    pkgs.sbctl
+    pkgs.tpm2-tools
+  ];
 
   # TODO: us に切り替えたら変える
   console.keyMap = "jp106";
@@ -57,11 +65,19 @@
   time.timeZone = "Asia/Tokyo";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   users.users.th3rm1t3 = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "docker" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "video"
+      "docker"
+    ];
     shell = pkgs.zsh;
   };
   programs.zsh.enable = true;

@@ -13,7 +13,12 @@
       height = 34;
       modules-left = [ "hyprland/workspaces" ];
       modules-center = [ "clock" ];
-      modules-right = [ "pulseaudio" "network" "battery" "tray" ];
+      modules-right = [
+        "pulseaudio"
+        "network"
+        "battery"
+        "tray"
+      ];
     };
   };
 
