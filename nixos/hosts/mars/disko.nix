@@ -1,6 +1,5 @@
 # TODO: 次回再インストール時に mars の modules に追加する
-{ ... }:
-{
+_: {
   disko.devices = {
     disk.main = {
       type = "disk";

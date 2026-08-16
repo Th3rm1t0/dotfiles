@@ -18,9 +18,10 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 
 ### 対象環境
 
-- Ubuntu on WSL2
+- **NixOS**: `mars`（デスクトップ、主環境）
+- **NixOS-WSL**: `triton`（WSL2 上で NixOS を実行）
+- **Ubuntu on WSL2**（home-manager 単体構成）: `ubuntu-wsl`。NixOS を導入しない WSL2 環境向け
 - Ubuntu Desktop（予定）
-- NixOS（予定）
 
 ## ディレクトリ構造と役割
 
@@ -30,14 +31,23 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
 ├── flake.lock          # 依存関係のロックファイル（自動生成）
 ├── justfile            # タスクランナーのレシピ定義
 ├── .envrc              # direnv 設定（use flake）
-├── hosts/              # ホスト固有の設定
+├── home/               # home-manager 層
 │   ├── common.nix      # 全ホスト共通設定
-│   └── <hostname>.nix  # 各ホストの設定
-├── home/               # ユーザー環境設定の本体
 │   ├── default.nix     # エントリポイント（programs/ を自動探索）
+│   ├── roles/          # ホストの用途ごとに共通する設定（wsl / desktop / bare-metal）
+│   ├── hosts/
+│   │   └── <hostname>.nix  # 各ホストの設定（common.nix + roles/ を組み合わせる）
 │   ├── programs/       # アプリケーション設定（1 アプリ 1 ディレクトリ）
 │   └── claude/         # Claude の Agent Skill 管理（agent-skills-nix）
-├── lib/                # ヘルパー関数（mkHome 等）
+├── nixos/              # NixOS 層
+│   ├── common.nix      # 全ホスト共通設定
+│   ├── default.nix     # エントリポイント（services/ を自動探索）
+│   ├── roles/          # ホストの用途ごとに共通する設定（secure-boot / desktop）
+│   ├── hosts/
+│   │   └── <hostname>/     # 各ホストの設定（hardware-configuration.nix 等を含む）
+│   │       └── default.nix
+│   └── services/       # サービス設定（1 サービス 1 ディレクトリ）
+├── lib/                # ヘルパー関数（mkHome / mkNixos 等）
 │   └── default.nix
 ├── overlays/           # nixpkgs のオーバーレイ（外部 flake の overlay 集約）
 │   └── default.nix
@@ -49,6 +59,20 @@ Nix flakes と home-manager を使用して、複数環境のユーザー環境�
     ├── check.yml       # push/PR 時の flake check
     └── update.yml      # flake.lock の週次自動更新
 ```
+
+## 2 層構造（NixOS 層 / home-manager 層）
+
+このリポジトリは独立した 2 つの層で構成される。
+
+- **NixOS 層**（`nixos/`）: システム全体で 1 つに定まる設定。ブートローダ、カーネル、ネットワーク、マルチユーザーで共有するサービスなど。
+- **home-manager 層**（`home/`）: ユーザーごとの設定。シェル、CLI ツール、ユーザーセッションで動くアプリケーションなど。
+
+設定をどちらに書くかは「システム全体で 1 つに定まるか」で判断する。迷ったら「複数ユーザーがいたら共有すべき設定か」を基準に考えるとよい。
+
+Hyprland はこの判断基準がそのまま両層にまたがる例になっている：
+
+- システム側の `programs.hyprland.enable`（NixOS 層）: Wayland セッションとして起動できるようにする setuid wrapper のインストールなど、システム全体に関わる部分
+- ユーザー側の `wayland.windowManager.hyprland`（home-manager 層）: キーバインド、起動アプリ、ウィンドウルールなど、ユーザーごとの設定
 
 ## 重要な規則
 
@@ -78,16 +102,18 @@ some-flake = {
 - 内部的なタスク参照やトラッキング番号（G1, G3 等）を含めない
 - 変更内容そのものを簡潔に日本語で記述する
 
-## モジュールの構造
+## モジュールの構造（home-manager 層）
 
 ### enable オプション
 
 各プログラムモジュールは `dotfiles.programs.<name>.enable` オプションを持つ。デフォルトは `true`。ホスト設定から無効化できる：
 
 ```nix
-# hosts/<hostname>.nix で特定プログラムを無効化
+# home/hosts/<hostname>.nix で特定プログラムを無効化
 dotfiles.programs.lazygit.enable = false;
 ```
+
+GUI・デスクトップ環境向けモジュール（foot / rofi / waybar / hyprland 等）は `default = false` とし、`home/roles/desktop.nix` から有効化する。`home/default.nix` の自動探索により `programs/` 配下は全ホストへ無条件に import されるため、WSL 環境への混入を防ぐ必要がある。
 
 ### モジュールのテンプレート
 
@@ -119,6 +145,28 @@ dotfiles.programs.lazygit.enable = false;
 
 - **programs.***：home-manager がそのプログラムのオプションを提供している場合
 - **xdg.configFile / home.file**：home-manager がサポートしていない場合、または既存の設定ファイルをそのまま使いたい場合
+
+## モジュールの構造（NixOS 層）
+
+home 層の `dotfiles.programs.<name>.enable` と対になる規約として、NixOS のサービスモジュールは `dotfiles.services.<name>.enable` オプションを持つ。home 層のプログラムはデフォルト有効（`default = true`）だが、NixOS のサービスはホストごとに必要なものだけ立てるためデフォルト無効（`mkEnableOption` の既定値のまま）とし、各ホストの `nixos/<hostname>/default.nix` から明示的に有効化する。
+
+```nix
+# nixos/services/<name>/default.nix
+{ config, lib, ... }:
+
+let
+  cfg = config.dotfiles.services.<name>;
+in
+{
+  options.dotfiles.services.<name>.enable = lib.mkEnableOption "<name>";
+
+  config = lib.mkIf cfg.enable {
+    # 設定内容
+  };
+}
+```
+
+`nixos/default.nix` が `services/` 配下のディレクトリを `builtins.readDir` で自動探索する。新しいサービスは `nixos/services/<name>/default.nix` を作成して `git add` するだけで認識される。
 
 ## overlay とカスタムパッケージ
 
@@ -155,8 +203,10 @@ pkgs: {
 
 | コマンド | 内容 |
 |----------|------|
-| `just build` | ビルドのみ（適用しない、nh 経由） |
-| `just switch` | ビルドして適用（nh 経由） |
+| `just build` | home-manager のビルドのみ（適用しない、nh 経由） |
+| `just switch` | home-manager をビルドして適用（nh 経由） |
+| `just os-build` | NixOS のビルドのみ（適用しない、nh 経由） |
+| `just os-switch` | NixOS をビルドして適用（nh 経由） |
 | `just update` | flake.lock を更新 |
 | `just gc` | Nix ストアのガベージコレクション |
 | `just check` | nix flake check |
@@ -172,15 +222,26 @@ pkgs: {
 2. `git add home/programs/<name>/`
 3. `just build` でビルド確認
 
-### 新しいホストを追加する場合
+### 新しい home-manager ホストを追加する場合
 
-1. `hosts/<hostname>.nix` を作成し、`common.nix` をインポート
+1. `home/hosts/<hostname>.nix` を作成し、`../common.nix` をインポート
 2. `flake.nix` の `homeConfigurations` に `lib.mkHome` で 1 行追加：
 ```nix
 "<user>@<hostname>" = lib.mkHome { hostname = "<hostname>"; };
 ```
 3. 必要に応じて `dotfiles.programs.<name>.enable = false;` でモジュールを無効化
 4. `git add` してビルド確認
+
+### 新しい NixOS ホストを追加する場合
+
+1. `nixos/hosts/<hostname>/default.nix` を作成（`hardware-configuration.nix` の import を含める）
+2. `flake.nix` の `nixosConfigurations` に `lib.mkNixos` で 1 行追加：
+```nix
+"<hostname>" = lib.mkNixos { hostname = "<hostname>"; };
+```
+   NixOS-WSL の場合は `extraModules = [ inputs.nixos-wsl.nixosModules.default ];` を追加する。
+3. `mkNixos` は home-manager モジュールを内蔵しており、`home/hosts/<hostname>.nix` を `users.${username}` に自動で割り当てる。ユーザー環境の設定はここに用意する
+4. `git add` してビルド確認：`nixos-rebuild build --flake .#<hostname>`
 
 ## よくある問題と解決策
 

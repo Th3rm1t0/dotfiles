@@ -39,10 +39,6 @@
       url = "github:ogulcancelik/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    catppuccin = {
-      url = "github:catppuccin/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     op-shell-plugins = {
       url = "github:1Password/shell-plugins";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -160,12 +156,12 @@
       };
 
       nixosConfigurations = {
-        triton = lib.mkNixos { 
+        triton = lib.mkNixos {
           hostname = "triton";
           extraModules = [ inputs.nixos-wsl.nixosModules.default ];
         };
-        mars = lib.mkNixos { 
-           hostname = "mars";
+        mars = lib.mkNixos {
+          hostname = "mars";
         };
       };
     };

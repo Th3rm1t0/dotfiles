@@ -5,7 +5,6 @@
     {
       hostname,
       system ? "x86_64-linux",
-      username ? "th3rm1t3",
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsFor system;
@@ -14,7 +13,7 @@
         inherit (inputs) self;
       };
       modules = [
-        ../hosts/${hostname}.nix
+        ../home/hosts/${hostname}.nix
       ];
     };
 
@@ -23,7 +22,7 @@
       hostname,
       system ? "x86_64-linux",
       username ? "th3rm1t3",
-      extraModules ? [],
+      extraModules ? [ ],
     }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
@@ -32,8 +31,9 @@
         inherit (inputs) self;
       };
       modules = [
-        ../nixos/modules
-        ../nixos/${hostname}
+        ../nixos/common.nix
+        ../nixos
+        ../nixos/hosts/${hostname}
         inputs.home-manager.nixosModules.home-manager
         {
           nixpkgs.config.allowUnfree = true;
@@ -45,9 +45,10 @@
               inherit inputs;
               inherit (inputs) self;
             };
-            users.${username} = import ../hosts/${hostname}.nix;
+            users.${username} = import ../home/hosts/${hostname}.nix;
           };
         }
-      ] ++ extraModules;
+      ]
+      ++ extraModules;
     };
 }

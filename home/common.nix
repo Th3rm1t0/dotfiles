@@ -7,19 +7,11 @@
 
 {
   imports = [
-    inputs.catppuccin.homeModules.catppuccin
     inputs.op-shell-plugins.hmModules.default
-    ../home
+    ./default.nix
   ];
 
   home.stateVersion = "24.05";
-
-  catppuccin = {
-    enable = false;
-    autoEnable = true;
-    flavor = "mocha";
-    accent = "blue";
-  };
 
   # XDG Base Directory
   xdg = {
