@@ -125,6 +125,6 @@ in
     };
     # デフォルトは fonts.sizes.applications (12pt) を継承するが、
     # ターミナルの文字が大きく感じられたため明示的に縮小する。
-    fonts.sizes.terminal = 10;
+    fonts.sizes.terminal = 9;
   };
 }
