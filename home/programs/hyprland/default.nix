@@ -40,7 +40,7 @@
 
           "$mod, F, fullscreen"
           "$mod, P, pseudo"
-          "$mod, J, togglesplit"
+          "$mod, J, layoutmsg, togglesplit"
         ]
         ++ (lib.concatMap (i: [
           "$mod, ${toString i}, workspace, ${toString i}"
