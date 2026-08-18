@@ -20,4 +20,5 @@ _: {
   # 無条件 import される home/programs/hyprland ではなく、Stylix を有効化する
   # ホストだけが import する desktop role 側に置く。
   stylix.targets.hyprland.enable = false;
+  stylix.targets.waybar.enable = false;
 }
