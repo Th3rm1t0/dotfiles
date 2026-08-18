@@ -85,7 +85,7 @@ in
 
   # 日本語入力: fcitx5 + mozc。
   # Hyprland は wlroots 系コンポジタで text-input-v3 / input-method-v2 を
-  # サポートしており、foot をはじめとするネイティブ Wayland アプリと
+  # サポートしており、これらのプロトコルに対応した Wayland アプリと
   # 相性が良い fcitx5 の waylandFrontend を使う。ibus は Wayland 対応が
   # 弱く、kime は韓国語向けで日本語変換エンジンを持たないため見送った。
   i18n.inputMethod = {
@@ -123,5 +123,8 @@ in
       package = pkgs.nerd-fonts.jetbrains-mono;
       name = "JetBrainsMono Nerd Font";
     };
+    # デフォルトは fonts.sizes.applications (12pt) を継承するが、
+    # ターミナルの文字が大きく感じられたため明示的に縮小する。
+    fonts.sizes.terminal = 10;
   };
 }

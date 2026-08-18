@@ -16,7 +16,7 @@
       settings = {
         "$mod" = "SUPER";
         bind = [
-          "$mod, Return, exec, foot"
+          "$mod, Return, exec, kitty"
           "$mod, Q, killactive"
           "$mod SHIFT, E, exit"
           "$mod, V, togglefloating"
