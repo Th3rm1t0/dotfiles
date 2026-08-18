@@ -34,8 +34,7 @@
           new_optimizations = true;
         };
         layerrule = [
-          "blur, waybar"
-          "ignorealpha 0.2, waybar"
+          "match:namespace waybar, blur 1, ignore_alpha 0.2"
         ];
         exec-once = [
           "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
