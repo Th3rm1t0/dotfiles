@@ -2,7 +2,7 @@ _: {
   fonts.fontconfig.enable = true;
 
   dotfiles.programs = {
-    foot.enable = true;
+    kitty.enable = true;
     rofi.enable = true;
     waybar.enable = true;
     hyprland.enable = true;
