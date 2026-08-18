@@ -27,6 +27,15 @@
           "$mod, mouse:272, movewindow"
           "$mod, mouse:273, resizewindow"
         ];
+        decoration.blur = {
+          enabled = true;
+          size = 6;
+          passes = 2;
+          new_optimizations = true;
+        };
+        layerrule = [
+          "match:namespace waybar, blur 1, ignore_alpha 0.2"
+        ];
         exec-once = [
           "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
           "waybar"
