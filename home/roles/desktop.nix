@@ -1,5 +1,11 @@
-_: {
+{ pkgs, ... }:
+{
   fonts.fontconfig.enable = true;
+
+  gtk.iconTheme = {
+    package = pkgs.papirus-icon-theme;
+    name = "Papirus-Dark";
+  };
 
   dotfiles.programs = {
     kitty.enable = true;

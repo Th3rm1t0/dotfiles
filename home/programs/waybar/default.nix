@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.dotfiles.programs.waybar;
@@ -11,8 +16,56 @@ in
   config = lib.mkIf cfg.enable (
     let
       colors = config.lib.stylix.colors.withHashtag;
+
+      # nm-applet は wlroots 系の SNI tray に表示されないため rofi + nmcli で代替
+      wifiMenu = pkgs.writeShellApplication {
+        name = "waybar-wifi-menu";
+        runtimeInputs = [
+          pkgs.networkmanager
+          pkgs.rofi
+          pkgs.gawk
+        ];
+        text = ''
+          wifi_list=$(nmcli -t -f active,ssid dev wifi list --rescan yes)
+
+          menu=$(printf '%s\n' "$wifi_list" | awk -F: '
+            $2 != "" && !seen[$2]++ {
+              printf "%s %s\n", ($1 == "yes" ? "*" : " "), $2
+            }
+          ')
+
+          chosen=$(printf '%s\n' "$menu" | rofi -dmenu -i -p "Wi-Fi")
+          if [ -z "$chosen" ]; then
+            exit 0
+          fi
+          ssid=''${chosen#??}
+
+          if err=$(nmcli device wifi connect "$ssid" 2>&1); then
+            exit 0
+          fi
+
+          if ! printf '%s' "$err" | grep -qi "secrets"; then
+            rofi -e "Wi-Fi 接続に失敗しました: $ssid"
+            exit 1
+          fi
+
+          password=$(rofi -dmenu -password -p "Password for $ssid")
+          if [ -z "$password" ]; then
+            exit 0
+          fi
+
+          if ! nmcli device wifi connect "$ssid" password "$password"; then
+            rofi -e "Wi-Fi 接続に失敗しました: $ssid"
+          fi
+        '';
+      };
     in
     {
+      home.packages = [
+        pkgs.pavucontrol
+        pkgs.playerctl
+      ];
+
       programs.waybar = {
         enable = true;
         settings.mainBar = {
@@ -21,9 +74,14 @@ in
           height = 0;
           spacing = 4;
 
-          modules-left = [ "hyprland/workspaces" ];
+          modules-left = [
+            "hyprland/workspaces"
+            "wlr/taskbar"
+          ];
           modules-center = [ "clock" ];
           modules-right = [
+            "mpris#player"
+            "mpris#title"
             "pulseaudio"
             "network"
             "battery"
@@ -36,6 +94,31 @@ in
             tooltip-format = "{:%Y年%m月%d日 (%A)}";
           };
 
+          "wlr/taskbar" = {
+            format = "{icon}";
+            icon-size = 18;
+            tooltip-format = "{title}";
+            on-click = "activate";
+            on-click-middle = "close";
+          };
+
+          "mpris#player" = {
+            format = "{player_icon} {player}";
+            player-icons = {
+              default = "󰐊";
+              spotify = "󰓇";
+            };
+          };
+
+          "mpris#title" = {
+            format = "{status_icon} {dynamic}";
+            dynamic-len = 40;
+            status-icons = {
+              playing = "󰐊";
+              paused = "󰏤";
+            };
+          };
+
           pulseaudio = {
             format = "{icon} {volume}%";
             format-muted = "󰝟 Muted";
@@ -46,6 +129,9 @@ in
                 "󰕾"
               ];
             };
+            scroll-step = 5;
+            on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+            on-click-right = "pavucontrol";
           };
 
           network = {
@@ -53,6 +139,7 @@ in
             format-ethernet = "󰈀 Wired";
             format-disconnected = "󰤮 Offline";
             tooltip-format = "{ifname}: {ipaddr}/{cidr}";
+            on-click = "${wifiMenu}/bin/waybar-wifi-menu";
           };
 
           battery = {
@@ -142,7 +229,10 @@ in
           }
 
           #workspaces,
+          #taskbar,
           #clock,
+          #player,
+          #title,
           #pulseaudio,
           #network,
           #battery,
@@ -183,16 +273,42 @@ in
               font-weight: 600;
           }
 
+          #taskbar {
+              border-left: 1px solid alpha(@base03, 0.5);
+              margin-left: 4px;
+          }
+
+          #taskbar button {
+              all: unset;
+              padding: 0 4px;
+              margin: 0 2px;
+              border-radius: 8px;
+              transition: all 0.2s ease-in-out;
+          }
+
+          #taskbar button.active {
+              background: alpha(@base0D, 0.25);
+          }
+
+          #player,
+          #title,
           #pulseaudio,
           #network,
           #battery {
               color: @base05;
           }
 
+          #title,
+          #pulseaudio,
           #network,
           #battery {
               border-left: 1px solid alpha(@base03, 0.5);
               margin-left: 4px;
+          }
+
+          #player.paused,
+          #title.paused {
+              opacity: 0.5;
           }
 
           #network.disconnected {
