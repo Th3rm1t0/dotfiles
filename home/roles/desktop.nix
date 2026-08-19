@@ -8,6 +8,7 @@ _: {
     hyprland.enable = true;
     zen-browser.enable = true;
     clipboard.enable = true;
+    spotify.enable = true;
   };
 
   # Hyprland 0.55 で設定形式が hyprlang から Lua へ移行中で、Stylix / home-manager の
