@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   options.dotfiles.programs.spotify.enable = lib.mkEnableOption "spotify" // {
