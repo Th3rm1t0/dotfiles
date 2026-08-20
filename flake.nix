@@ -32,7 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     herdr = {
-      url = "github:ogulcancelik/herdr";
+      url = "github:herdrdev/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     op-shell-plugins = {
