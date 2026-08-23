@@ -1,0 +1,19 @@
+vim.g.mapleader = " " -- Set leader key to space
+vim.g.maplocalleader = " " -- Set local leader key to space
+
+local opt = vim.opt
+opt.number = true
+opt.relativenumber = true
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.tabstop = 2
+opt.smartindent = true
+opt.termguicolors = true
+opt.signcolumn = "yes"
+opt.splitright = true
+opt.splitbelow = true
+opt.ignorecase = true
+opt.smartcase = true
+opt.scrolloff = 8
+opt.clipboard = "unnamedplus"
+opt.updatetime = 250
