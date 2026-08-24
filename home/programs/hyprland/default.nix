@@ -22,6 +22,7 @@
           "$mod, V, togglefloating"
           "$mod, D, exec, rofi -show drun"
           "$mod SHIFT, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
+          "$mod, N, exec, swaync-client -t -sw"
 
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"

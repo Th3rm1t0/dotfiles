@@ -15,6 +15,7 @@
     zen-browser.enable = true;
     clipboard.enable = true;
     spotify.enable = true;
+    swaync.enable = true;
   };
 
   # Hyprland 0.55 で設定形式が hyprlang から Lua へ移行中で、Stylix / home-manager の
@@ -28,4 +29,5 @@
   # ホストだけが import する desktop role 側に置く。
   stylix.targets.hyprland.enable = false;
   stylix.targets.waybar.enable = false;
+  stylix.targets.swaync.enable = false;
 }
