@@ -254,6 +254,7 @@ in
           #pulseaudio,
           #network,
           #battery,
+          #custom-notification,
           #tray {
               padding: 0 8px;
           }
@@ -312,8 +313,7 @@ in
           #title,
           #pulseaudio,
           #network,
-          #battery,
-          #custom-notification {
+          #battery {
               color: @base05;
           }
 
@@ -351,9 +351,32 @@ in
               color: @base0B;
           }
 
-          #custom-notification.dnd-notification,
-          #custom-notification.dnd-none {
+          #custom-notification {
+              color: @base05;
+              opacity: 0.6;
+              border-radius: 8px;
+              transition: all 0.2s ease-in-out;
+          }
+
+          #custom-notification:hover {
+              opacity: 1;
+              background: alpha(@base0D, 0.15);
+          }
+
+          #custom-notification.notification {
+              opacity: 1;
+              color: @base0D;
+              background: alpha(@base0D, 0.18);
+          }
+
+          #custom-notification.dnd-notification {
+              opacity: 1;
               color: @base0A;
+              background: alpha(@base0A, 0.18);
+          }
+
+          #custom-notification.dnd-none {
+              opacity: 0.4;
           }
 
           #tray {
