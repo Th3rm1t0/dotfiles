@@ -7,6 +7,8 @@
     name = "Papirus-Dark";
   };
 
+  home.packages = [ pkgs.libnotify ];
+
   dotfiles.programs = {
     kitty.enable = true;
     rofi.enable = true;
