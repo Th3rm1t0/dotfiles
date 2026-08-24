@@ -85,6 +85,7 @@ in
             "pulseaudio"
             "network"
             "battery"
+            "custom/notification"
             "tray"
           ];
 
@@ -161,6 +162,23 @@ in
               warning = 25;
               critical = 10;
             };
+          };
+
+          "custom/notification" = {
+            tooltip = false;
+            format = "{icon}";
+            format-icons = {
+              notification = "󱅫";
+              none = "󰂚";
+              dnd-notification = "󱏨";
+              dnd-none = "󰂛";
+            };
+            return-type = "json";
+            exec-if = "which swaync-client";
+            exec = "swaync-client -swb";
+            on-click = "swaync-client -t -sw";
+            on-click-right = "swaync-client -d -sw";
+            escape = true;
           };
 
           tray = {
@@ -294,14 +312,16 @@ in
           #title,
           #pulseaudio,
           #network,
-          #battery {
+          #battery,
+          #custom-notification {
               color: @base05;
           }
 
           #title,
           #pulseaudio,
           #network,
-          #battery {
+          #battery,
+          #custom-notification {
               border-left: 1px solid alpha(@base03, 0.5);
               margin-left: 4px;
           }
@@ -329,6 +349,11 @@ in
 
           #battery.charging {
               color: @base0B;
+          }
+
+          #custom-notification.dnd-notification,
+          #custom-notification.dnd-none {
+              color: @base0A;
           }
 
           #tray {
