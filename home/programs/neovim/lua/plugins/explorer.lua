@@ -8,6 +8,7 @@ return {
     dependencies = {
         { dir = require("nix_plugins")["plenary-nvim"], name = "plenary.nvim" },
         { dir = require("nix_plugins")["nvim-web-devicons"], name = "nvim-web-devicons" },
+        { dir = require("nix_plugins")["nui-nvim"], name = "nui.nvim" },
     },
     opts = {
         close_if_last_window = true,

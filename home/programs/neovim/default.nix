@@ -33,6 +33,7 @@ let
       nvim-autopairs
       comment-nvim
       plenary-nvim
+      nui-nvim
       ;
     nvim-treesitter = pkgs.symlinkJoin {
       name = "nvim-treesitter-with-grammars";
