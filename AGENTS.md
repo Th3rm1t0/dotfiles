@@ -249,6 +249,10 @@ pkgs: {
 
 新規ファイルが `git add` されていない。`git add <ファイル>` で解決。
 
+### "No such file or directory" エラー（ディレクトリ丸ごと消失）
+
+`nixos/services/` や `home/programs/` のように `builtins.readDir` の直接の対象になっている親ディレクトリは、配下の最後の1エントリ（例: 最後のサービスモジュール）を削除して中身が空になると、Git 追跡ファイルが無くなり flake のソースツリーからパスごと消え、`nix flake check` / `nixos-rebuild` 等が `error: getting status of '.../services': No such file or directory` のようなエラーで失敗する。対処として、親ディレクトリ直下に `.gitkeep` を置いて Git 追跡を維持する（個別の `<name>/` サブディレクトリではなく、`readDir` の対象そのものに置く点に注意）。
+
 ### "infinite recursion" エラー
 
 モジュール間の循環参照。`lib.mkDefault` や `lib.mkForce` で優先度を明示するか、imports の構造を見直す。
