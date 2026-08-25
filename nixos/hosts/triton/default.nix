@@ -9,7 +9,5 @@ _: {
   # VS Code Remote (WSL) 等の動的リンクバイナリ用
   programs.nix-ld.enable = true;
 
-  dotfiles.services = { };
-
   system.stateVersion = "25.05";
 }
