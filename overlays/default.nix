@@ -30,6 +30,7 @@
           ++ (with final.python3Packages; [
             truststore
             tomlkit
+            websockets
           ]);
       }
     );
