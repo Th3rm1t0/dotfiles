@@ -19,6 +19,6 @@
       };
     };
     user.signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPit0XMIE0xrI2ZdX2R94TbvDE+B4V1bEUb18HAAAQQA GitHub";
-    commit.gpgsign = true;
+    commit.gpgsign = false;
   };
 }
