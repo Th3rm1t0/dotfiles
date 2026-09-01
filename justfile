@@ -14,6 +14,9 @@ switch:
 os-build:
     nh os build . -H {{host}}
 
+os-test:
+    nh os test . -H {{host}}
+
 os-switch:
     nh os switch . -H {{host}}
 
