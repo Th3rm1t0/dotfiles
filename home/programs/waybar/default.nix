@@ -59,9 +59,34 @@ in
           fi
         '';
       };
+
+      # ネイティブの backlight モジュールがこの waybar ビルドでは動かないため custom/backlight で代替する。
+      brightnessSignal = 8;
+      brightnessRefresh = "pkill -RTMIN+${toString brightnessSignal} waybar";
+
+      brightnessStatus = pkgs.writeShellApplication {
+        name = "waybar-brightness-status";
+        runtimeInputs = [
+          pkgs.brightnessctl
+          pkgs.coreutils
+        ];
+        text = ''
+          pct=$(brightnessctl -c backlight -m | cut -d, -f4 | tr -d '%')
+
+          icon="󰃞"
+          if [ "$pct" -ge 66 ]; then
+            icon="󰃠"
+          elif [ "$pct" -ge 33 ]; then
+            icon="󰃟"
+          fi
+
+          printf '{"text":"%s %s%%","tooltip":"明るさ: %s%%","class":"backlight"}\n' "$icon" "$pct" "$pct"
+        '';
+      };
     in
     {
       home.packages = [
+        pkgs.brightnessctl
         pkgs.pavucontrol
         pkgs.playerctl
       ];
@@ -82,6 +107,7 @@ in
           modules-right = [
             "mpris#player"
             "mpris#title"
+            "custom/backlight"
             "pulseaudio"
             "network"
             "battery"
@@ -118,6 +144,16 @@ in
               playing = "󰐊";
               paused = "󰏤";
             };
+          };
+
+          "custom/backlight" = {
+            tooltip = true;
+            return-type = "json";
+            exec = "${brightnessStatus}/bin/waybar-brightness-status";
+            interval = 5;
+            signal = brightnessSignal;
+            on-scroll-up = "brightnessctl set 5%+ -c backlight && ${brightnessRefresh}";
+            on-scroll-down = "brightnessctl set 5%- -c backlight && ${brightnessRefresh}";
           };
 
           pulseaudio = {
@@ -251,6 +287,7 @@ in
           #clock,
           #player,
           #title,
+          #custom-backlight,
           #pulseaudio,
           #network,
           #battery,
@@ -311,6 +348,7 @@ in
 
           #player,
           #title,
+          #custom-backlight,
           #pulseaudio,
           #network,
           #battery {
@@ -318,6 +356,7 @@ in
           }
 
           #title,
+          #custom-backlight,
           #pulseaudio,
           #network,
           #battery,
