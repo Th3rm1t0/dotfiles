@@ -67,7 +67,6 @@
         exec-once = [
           "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
           "playerctld"
-          "waybar"
           "wl-paste --watch cliphist store"
           "fcitx5 -d"
         ];
